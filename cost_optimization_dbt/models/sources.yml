@@ -1,0 +1,99 @@
+version: 2
+
+sources:
+  - name: account_usage
+    database: SNOWFLAKE
+    schema: ACCOUNT_USAGE
+    description: >
+      Snowflake ACCOUNT_USAGE views providing metadata about query history,
+      warehouse metering, storage, access patterns, and serverless feature usage.
+      Most views have 365-day data retention.
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+    loaded_at_field: _loaded_at
+
+    tables:
+      - name: QUERY_HISTORY
+        description: One row per query executed. 365-day retention.
+        columns:
+          - name: QUERY_ID
+            description: Unique identifier for each query execution.
+
+      - name: WAREHOUSE_METERING_HISTORY
+        description: Hourly credit consumption per warehouse. 365-day retention.
+        columns:
+          - name: START_TIME
+            description: Start of the hourly metering interval.
+
+      - name: WAREHOUSE_LOAD_HISTORY
+        description: 5-minute interval warehouse load metrics. 365-day retention.
+        columns:
+          - name: START_TIME
+            description: Start of the 5-minute interval.
+
+      - name: TABLE_STORAGE_METRICS
+        description: Current storage metrics per table (active, time travel, failsafe bytes).
+        columns:
+          - name: ID
+            description: Internal table ID.
+
+      - name: STORAGE_USAGE
+        description: Daily account-level storage usage. 365-day retention.
+        columns:
+          - name: USAGE_DATE
+            description: Date of storage measurement.
+
+      - name: DATABASE_STORAGE_USAGE_HISTORY
+        description: Daily storage usage per database. 365-day retention.
+        columns:
+          - name: USAGE_DATE
+            description: Date of storage measurement.
+
+      - name: LOGIN_HISTORY
+        description: User login attempts and authentication details. 365-day retention.
+        columns:
+          - name: EVENT_TIMESTAMP
+            description: Timestamp of the login event.
+
+      - name: ACCESS_HISTORY
+        description: Object access audit trail per query. 365-day retention.
+        columns:
+          - name: QUERY_ID
+            description: Query that accessed the objects.
+
+      - name: AUTOMATIC_CLUSTERING_HISTORY
+        description: Credit usage for automatic clustering. 365-day retention.
+        columns:
+          - name: START_TIME
+            description: Start of the clustering interval.
+
+      - name: MATERIALIZED_VIEW_REFRESH_HISTORY
+        description: Credit usage for materialized view refreshes. 365-day retention.
+        columns:
+          - name: START_TIME
+            description: Start of the refresh interval.
+
+      - name: PIPE_USAGE_HISTORY
+        description: Credit and data volume for Snowpipe ingestion. 365-day retention.
+        columns:
+          - name: START_TIME
+            description: Start of the pipe usage interval.
+
+      - name: SERVERLESS_TASK_HISTORY
+        description: Credit usage for serverless tasks. 365-day retention.
+        columns:
+          - name: START_TIME
+            description: Start of the task execution interval.
+
+      - name: SESSIONS
+        description: Session details including client application. 365-day retention.
+        columns:
+          - name: SESSION_ID
+            description: Unique session identifier.
+
+      - name: SEARCH_OPTIMIZATION_HISTORY
+        description: Credit usage for search optimization service. 365-day retention.
+        columns:
+          - name: START_TIME
+            description: Start of the search optimization interval.

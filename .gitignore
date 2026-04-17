@@ -1,0 +1,30 @@
+# Secrets
+Connect-token-secret.txt
+*.p8
+*.pem
+
+# dbt
+cost_optimization_dbt/target/
+cost_optimization_dbt/dbt_packages/
+cost_optimization_dbt/logs/
+cost_optimization_dbt/profiles.yml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.mp4
+*.mov

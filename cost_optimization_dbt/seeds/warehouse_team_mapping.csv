@@ -1,0 +1,6 @@
+warehouse_name,role_name,team_name,cost_center
+COMPUTE_WH,,Platform,PLATFORM-001
+COST_OPT_WH,,Cost Optimization,COSTOPT-001
+ANALYTICS_WH,,Analytics,ANALYTICS-001
+ETL_WH,,Data Engineering,DATAENG-001
+SNOWFLAKE_LEARNING_WH,,Training,TRAINING-001

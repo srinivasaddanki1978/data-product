@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: pub__cost_summary
+    description: Monthly cost summary with MoM change percentages. Powers Executive Summary.
+    columns:
+      - name: month
+        tests: [unique, not_null]
+      - name: total_cost
+        tests: [{assert_positive_value: {}}]
+
+  - name: pub__cost_by_warehouse
+    description: Per-warehouse cost, utilisation, and query stats. Powers Warehouse Deep Dive.
+    columns:
+      - name: warehouse_name
+        tests: [unique, not_null]
+
+  - name: pub__cost_by_user
+    description: Per-user cost summary with top 5 expensive queries. Powers Team Attribution.
+    columns:
+      - name: user_name
+        tests: [unique, not_null]
+
+  - name: pub__cost_by_query_type
+    description: Cost aggregated by query type. Powers Trend Analysis.
+    columns:
+      - name: query_type
+        tests: [unique, not_null]
+
+  - name: pub__storage_analysis
+    description: Per-table storage breakdown with unused flags. Powers Storage Explorer.
+    columns:
+      - name: table_name
+        tests: [not_null]
+
+  - name: pub__cost_trends_daily
+    description: Daily cost time series with anomaly flags. Powers Trend Analysis charts.
+    columns:
+      - name: date
+        tests: [unique, not_null]
+
+  - name: pub__warehouse_efficiency
+    description: Warehouse efficiency scores (0-100). Powers Warehouse Deep Dive.
+    columns:
+      - name: warehouse_name
+        tests: [unique, not_null]
+      - name: efficiency_score
+        tests: [{assert_positive_value: {}}]
+
+  - name: pub__team_cost_dashboard
+    description: Team-level monthly cost dashboard. Powers Team Attribution.
+    columns:
+      - name: team_name
+        tests: [not_null]
+      - name: month
+        tests: [not_null]
+
+  - name: pub__weekly_executive_report
+    description: Single-row weekly executive summary for push-based email reporting.
+    columns:
+      - name: report_date
+        tests: [not_null]
+
+  - name: pub__recommendation_roi
+    description: Recommendation ROI detail with funnel aggregation. Powers ROI Dashboard tab.
+    columns:
+      - name: recommendation_id
+        tests: [unique, not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['OPEN', 'ACCEPTED', 'IMPLEMENTED', 'REJECTED', 'DEFERRED']
+
+  - name: pub__cost_forecast
+    description: Monthly aggregated cost forecasts with actuals for chart context and annual projection.
+    columns:
+      - name: month
+        tests: [not_null]
+      - name: data_type
+        tests:
+          - accepted_values:
+              values: ['ACTUAL', 'FORECAST']
+
+  - name: pub__data_freshness
+    description: Data source freshness with overall status for dashboard banner.
+    columns:
+      - name: source_name
+        tests: [unique, not_null]
+      - name: freshness_status
+        tests:
+          - accepted_values:
+              values: ['FRESH', 'STALE', 'CRITICAL']

@@ -1,0 +1,32 @@
+name: 'cost_optimization'
+version: '1.0.0'
+
+profile: 'cost_optimization'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+seeds:
+  cost_optimization:
+    +schema: SEEDS
+
+models:
+  cost_optimization:
+    staging:
+      +materialized: view
+      +schema: STAGING
+    intermediate:
+      +materialized: table
+      +schema: INTERMEDIATE
+    publication:
+      +materialized: table
+      +schema: PUBLICATION
+    alerts:
+      +materialized: table
+      +schema: INTERMEDIATE

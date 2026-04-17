@@ -1,0 +1,4 @@
+edition,credit_price_usd,effective_from,effective_to
+STANDARD,2.00,2024-01-01,9999-12-31
+ENTERPRISE,3.00,2024-01-01,9999-12-31
+BUSINESS_CRITICAL,4.00,2024-01-01,9999-12-31

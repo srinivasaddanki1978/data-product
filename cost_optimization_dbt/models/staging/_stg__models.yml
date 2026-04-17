@@ -1,0 +1,164 @@
+version: 2
+
+models:
+  - name: stg__query_history
+    description: Cleaned query execution history from ACCOUNT_USAGE. Incremental on end_time.
+    columns:
+      - name: query_id
+        description: Unique query identifier.
+        tests:
+          - unique
+          - not_null
+      - name: warehouse_name
+        description: Warehouse that executed the query.
+      - name: user_name
+        description: User who submitted the query.
+      - name: start_time
+        description: Query start timestamp.
+        tests:
+          - not_null
+      - name: end_time
+        description: Query end timestamp.
+        tests:
+          - not_null
+
+  - name: stg__warehouse_metering_history
+    description: Hourly credit consumption per warehouse.
+    columns:
+      - name: warehouse_name
+        description: Name of the warehouse.
+        tests:
+          - not_null
+      - name: start_time
+        description: Start of the metering hour.
+        tests:
+          - not_null
+      - name: credits_used
+        description: Total credits consumed in this interval.
+
+  - name: stg__warehouse_load_history
+    description: 5-minute interval warehouse load metrics.
+    columns:
+      - name: warehouse_name
+        description: Name of the warehouse.
+        tests:
+          - not_null
+      - name: start_time
+        description: Start of the 5-minute interval.
+        tests:
+          - not_null
+
+  - name: stg__table_storage_metrics
+    description: Current storage metrics per table.
+    columns:
+      - name: table_id
+        description: Internal Snowflake table ID.
+        tests:
+          - not_null
+      - name: table_name
+        description: Name of the table.
+
+  - name: stg__storage_usage
+    description: Daily account-level storage usage.
+    columns:
+      - name: usage_date
+        description: Date of storage measurement.
+        tests:
+          - unique
+          - not_null
+
+  - name: stg__database_storage_usage_history
+    description: Daily storage usage per database.
+    columns:
+      - name: usage_date
+        description: Date of storage measurement.
+        tests:
+          - not_null
+      - name: database_name
+        description: Name of the database.
+        tests:
+          - not_null
+
+  - name: stg__login_history
+    description: User login attempts and authentication events.
+    columns:
+      - name: event_id
+        description: Unique login event identifier.
+        tests:
+          - unique
+          - not_null
+
+  - name: stg__access_history
+    description: Object access audit trail per query.
+    columns:
+      - name: query_id
+        description: Query that accessed the objects.
+        tests:
+          - not_null
+
+  - name: stg__automatic_clustering_history
+    description: Credit usage for automatic clustering operations.
+    columns:
+      - name: start_time
+        description: Start of the clustering interval.
+        tests:
+          - not_null
+
+  - name: stg__materialized_view_refresh_history
+    description: Credit usage for materialized view refreshes.
+    columns:
+      - name: start_time
+        description: Start of the refresh interval.
+        tests:
+          - not_null
+
+  - name: stg__pipe_usage_history
+    description: Credit and data volume for Snowpipe ingestion.
+    columns:
+      - name: start_time
+        description: Start of the pipe usage interval.
+        tests:
+          - not_null
+
+  - name: stg__serverless_task_history
+    description: Credit usage for serverless tasks.
+    columns:
+      - name: start_time
+        description: Start of the task execution interval.
+        tests:
+          - not_null
+
+  - name: stg__sessions
+    description: Session details including client application.
+    columns:
+      - name: session_id
+        description: Unique session identifier.
+        tests:
+          - unique
+          - not_null
+
+  - name: stg__search_optimization_history
+    description: Credit usage for search optimization service.
+    columns:
+      - name: start_time
+        description: Start of the search optimization interval.
+        tests:
+          - not_null
+
+  - name: stg__warehouse_role_usage
+    description: >
+      Dynamically extracted warehouse-to-role-to-user mapping from ACCOUNT_USAGE.
+      Derives team attribution from actual query execution patterns instead of static seed files.
+    columns:
+      - name: warehouse_name
+        description: Warehouse used for query execution.
+        tests:
+          - not_null
+      - name: role_name
+        description: Role used to run the query.
+        tests:
+          - not_null
+      - name: user_name
+        description: User who executed the query.
+        tests:
+          - not_null
