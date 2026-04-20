@@ -7,7 +7,7 @@ SELECT
     table_name,
     table_schema AS schema_name,
     table_catalog AS database_name,
-    table_type,
+    CASE WHEN is_transient = 'YES' THEN 'TRANSIENT TABLE' ELSE 'BASE TABLE' END AS table_type,
     is_transient,
     active_bytes,
     time_travel_bytes,
@@ -16,7 +16,8 @@ SELECT
     table_created::TIMESTAMP_NTZ AS table_created,
     table_dropped::TIMESTAMP_NTZ AS table_dropped,
     table_entered_failsafe::TIMESTAMP_NTZ AS table_entered_failsafe,
-    last_altered::TIMESTAMP_NTZ AS last_altered,
+    deleted AS is_deleted,
+    table_created::TIMESTAMP_NTZ AS last_altered,
     comment,
     CURRENT_TIMESTAMP()::TIMESTAMP_NTZ AS _loaded_at
 FROM source

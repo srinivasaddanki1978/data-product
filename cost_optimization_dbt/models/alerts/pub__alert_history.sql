@@ -11,6 +11,7 @@
 WITH tracker AS (
     SELECT *
     FROM {{ ref('int__alert_state_tracker') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY alert_episode_key ORDER BY detected_at DESC) = 1
 ),
 
 config AS (

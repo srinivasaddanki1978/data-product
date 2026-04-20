@@ -76,7 +76,7 @@ Each detected anti-pattern includes the specific query, the user who ran it, the
 
 ### 4. Proactive Alerting with Microsoft Teams Integration
 
-Rather than waiting for someone to open a dashboard and notice a problem, the framework actively monitors for cost anomalies and sends notifications directly to Microsoft Teams channels. Seven alert types are built in:
+Rather than waiting for someone to open a dashboard and notice a problem, the framework actively monitors for cost anomalies and sends notifications directly to Microsoft Teams channels. Six alert types are built in:
 
 - **Daily cost spike** — today's spend exceeds twice the 30-day rolling average. Something unusual is happening.
 
@@ -184,7 +184,7 @@ The staging models clean and standardise this raw data: column names are normali
 
 ### Layer 2: Intermediate (Business Logic)
 
-The intermediate layer is where the intelligence lives. Over 30 models perform cost calculations, utilisation analysis, anti-pattern detection, anomaly identification, alert state tracking, cost forecasting, seasonality baselines, recommendation lifecycle management, and data freshness monitoring.
+The intermediate layer is where the intelligence lives. Over 40 models (31 intermediate and 10 alert models) perform cost calculations, utilisation analysis, anti-pattern detection, anomaly identification, alert state tracking, cost forecasting, seasonality baselines, recommendation lifecycle management, and data freshness monitoring.
 
 Key computations include:
 - Converting query execution time and warehouse size into estimated dollar cost per query
@@ -301,7 +301,7 @@ The framework is delivered in two phases over eight weeks:
 
 **Week 1** establishes the foundation. We set up the dbt project, connect to the 14 Snowflake metadata sources, and build the staging layer that cleans and standardises the raw data. We also load the configuration files that define credit pricing, alert thresholds, and budget targets.
 
-**Week 2** builds the intelligence layer. Ten intermediate models perform cost attribution at every level — per warehouse, per team, per user, per query. They calculate utilisation metrics, detect idle periods, identify cost anomalies, and compute rolling averages. Eight publication models shape this data for the dashboard.
+**Week 2** builds the intelligence layer. Intermediate models perform cost attribution at every level — per warehouse, per team, per user, per query. They calculate utilisation metrics, detect idle periods, identify cost anomalies, and compute rolling averages. Publication models shape this data for the dashboard.
 
 **Week 3** delivers the interactive dashboard. Five pages cover the executive summary, warehouse deep-dive, team attribution, storage exploration, and trend analysis. The dashboard is deployed natively inside Snowflake and accessible to anyone with the appropriate role.
 
@@ -327,7 +327,7 @@ At the end of Phase 2, the customer has a complete optimisation engine with a pr
 
 At the conclusion of the eight-week engagement, the customer receives:
 
-1. **A production-ready dbt project** with over 80 tested, documented data models that transform Snowflake's raw metadata into actionable cost intelligence, including cost forecasting, seasonality baselines, recommendation lifecycle tracking, and data freshness monitoring.
+1. **A production-ready dbt project** with 72 tested, documented data models and 6 configuration seeds that transform Snowflake's raw metadata into actionable cost intelligence, including cost forecasting, seasonality baselines, recommendation lifecycle tracking, and data freshness monitoring.
 
 2. **A twelve-page interactive dashboard** running natively in Snowflake, providing cost visibility from executive summary down to individual query level, plus cost forecasting with confidence intervals and an ROI tracking dashboard.
 

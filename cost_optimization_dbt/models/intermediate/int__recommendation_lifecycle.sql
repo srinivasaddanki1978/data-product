@@ -17,12 +17,12 @@ WITH recommendations AS (
 
 actions AS (
     SELECT
-        recommendation_id,
-        status,
-        actioned_by,
-        actioned_at,
-        implemented_at,
-        notes
+        recommendation_id::STRING AS recommendation_id,
+        status::STRING AS status,
+        actioned_by::STRING AS actioned_by,
+        actioned_at::STRING AS actioned_at,
+        implemented_at::STRING AS implemented_at,
+        notes::STRING AS notes
     FROM {{ ref('recommendation_actions') }}
 ),
 
@@ -62,8 +62,8 @@ lifecycle AS (
             ELSE NULL
         END AS actual_savings_usd,
         CASE
-            WHEN COALESCE(a.status, 'OPEN') = 'IMPLEMENTED'
-            THEN DATEDIFF('day', a.implemented_at, CURRENT_DATE())
+            WHEN COALESCE(a.status, 'OPEN') = 'IMPLEMENTED' AND a.implemented_at IS NOT NULL
+            THEN DATEDIFF('day', TRY_TO_DATE(a.implemented_at::STRING), CURRENT_DATE())
             ELSE NULL
         END AS days_since_implementation
     FROM recommendations r

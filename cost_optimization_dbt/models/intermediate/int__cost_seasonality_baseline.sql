@@ -2,7 +2,7 @@
 -- Produces per-date baselines with trend adjustment for smarter anomaly detection.
 WITH daily_data AS (
     SELECT
-        date,
+        date AS cost_date,
         total_cost,
         DAYOFWEEK(date) AS day_of_week,
         DAY(date) AS day_of_month,
@@ -45,14 +45,28 @@ month_end_stats AS (
     WHERE is_month_end = TRUE
 ),
 
+-- Global min date for trend offset
+date_bounds AS (
+    SELECT MIN(cost_date) AS min_date
+    FROM daily_data
+),
+
 -- Weekly trend via REGR_SLOPE
-weekly_totals AS (
+weekly_totals_raw AS (
     SELECT
-        DATE_TRUNC('week', date)::DATE AS week_start,
-        SUM(total_cost) AS weekly_cost,
-        DATEDIFF('week', MIN(date) OVER (), DATE_TRUNC('week', date)) AS week_offset
+        DATE_TRUNC('week', cost_date)::DATE AS week_start,
+        SUM(total_cost) AS weekly_cost
     FROM daily_data
     GROUP BY 1
+),
+
+weekly_totals AS (
+    SELECT
+        wt.week_start,
+        wt.weekly_cost,
+        DATEDIFF('week', db.min_date, wt.week_start) AS week_offset
+    FROM weekly_totals_raw wt
+    CROSS JOIN date_bounds db
 ),
 
 trend AS (
@@ -63,7 +77,7 @@ trend AS (
 )
 
 SELECT
-    dd.date,
+    dd.cost_date AS date,
     dd.total_cost,
     dd.day_of_week,
     dd.day_of_month,
@@ -78,7 +92,7 @@ SELECT
     -- Trend adjustment: shift DOW avg by linear trend
     COALESCE(dw.dow_avg_cost, 0)
         + COALESCE(t.wow_growth_slope, 0)
-          * (DATEDIFF('week', (SELECT MIN(date) FROM daily_data), dd.date) - COALESCE(t.max_week_offset, 0) / 2.0)
+          * (DATEDIFF('week', db.min_date, dd.cost_date) - COALESCE(t.max_week_offset, 0) / 2.0)
           / 7.0
     AS adjusted_baseline,
     -- Use month-end stddev when on month-end days (higher threshold to avoid false positives)
@@ -92,3 +106,4 @@ LEFT JOIN dow_stats dw ON dd.day_of_week = dw.day_of_week
 LEFT JOIN dom_stats dm ON dd.day_of_month = dm.day_of_month
 CROSS JOIN month_end_stats me
 CROSS JOIN trend t
+CROSS JOIN date_bounds db
