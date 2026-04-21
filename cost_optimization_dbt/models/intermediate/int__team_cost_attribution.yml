@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: int__team_cost_attribution
+  description: Cost attribution by team with proportional allocation.
+  columns:
+  - name: team_name
+    tests:
+    - not_null
+  - name: month
+    tests:
+    - not_null

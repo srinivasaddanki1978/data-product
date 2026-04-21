@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__antipattern_full_table_scan
+  description: Queries scanning >80% of partitions on tables with >100 partitions.
+  columns:
+  - name: query_id
+    tests:
+    - not_null

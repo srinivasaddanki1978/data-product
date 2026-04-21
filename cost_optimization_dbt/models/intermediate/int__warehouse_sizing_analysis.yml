@@ -1,0 +1,10 @@
+version: 2
+models:
+- name: int__warehouse_sizing_analysis
+  description: Per-warehouse sizing metrics with execution time percentiles and spill
+    frequency.
+  columns:
+  - name: warehouse_name
+    tests:
+    - unique
+    - not_null

@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: pub__cost_by_query_type
+  description: Cost aggregated by query type. Powers Trend Analysis.
+  columns:
+  - name: query_type
+    tests:
+    - unique
+    - not_null

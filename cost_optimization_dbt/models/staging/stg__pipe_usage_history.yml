@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: stg__pipe_usage_history
+  description: Credit and data volume for Snowpipe ingestion.
+  columns:
+  - name: start_time
+    description: Start of the pipe usage interval.
+    tests:
+    - not_null

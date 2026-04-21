@@ -1,0 +1,13 @@
+version: 2
+models:
+- name: stg__database_storage_usage_history
+  description: Daily storage usage per database.
+  columns:
+  - name: usage_date
+    description: Date of storage measurement.
+    tests:
+    - not_null
+  - name: database_name
+    description: Name of the database.
+    tests:
+    - not_null

@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__alert_query_spill
+  description: Detects queries spilling over threshold bytes to remote storage.
+  columns:
+  - name: alert_id
+    tests:
+    - not_null

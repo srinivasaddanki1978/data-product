@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: pub__query_optimization_candidates
+  description: Top 100 query optimization opportunities ranked by waste.
+  columns:
+  - name: optimization_rank
+    tests:
+    - unique
+    - not_null
+  - name: estimated_waste_usd
+    tests:
+    - assert_positive_value: {}

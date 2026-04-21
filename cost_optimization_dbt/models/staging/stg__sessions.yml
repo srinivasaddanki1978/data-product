@@ -1,0 +1,10 @@
+version: 2
+models:
+- name: stg__sessions
+  description: Session details including client application.
+  columns:
+  - name: session_id
+    description: Unique session identifier.
+    tests:
+    - unique
+    - not_null

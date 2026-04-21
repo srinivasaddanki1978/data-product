@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__antipattern_union_all
+  description: Union of all anti-pattern detection models in standardized schema.
+  columns:
+  - name: antipattern_type
+    tests:
+    - not_null

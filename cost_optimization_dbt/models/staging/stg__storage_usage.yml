@@ -1,0 +1,10 @@
+version: 2
+models:
+- name: stg__storage_usage
+  description: Daily account-level storage usage.
+  columns:
+  - name: usage_date
+    description: Date of storage measurement.
+    tests:
+    - unique
+    - not_null

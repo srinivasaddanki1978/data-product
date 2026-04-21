@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: int__alert_union_all
+  description: Union of all alert detection models in standardized schema.
+  columns:
+  - name: alert_id
+    tests:
+    - not_null
+  - name: detected_at
+    tests:
+    - not_null

@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: pub__teams_alert_payload
+  description: 'Teams Adaptive Card payloads for new alert episodes. Only generates
+    for alerts with teams_enabled=TRUE.
+
+    '
+  columns:
+  - name: alert_episode_key
+    tests:
+    - unique
+    - not_null

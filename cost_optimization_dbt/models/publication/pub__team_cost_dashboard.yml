@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: pub__team_cost_dashboard
+  description: Team-level monthly cost dashboard. Powers Team Attribution.
+  columns:
+  - name: team_name
+    tests:
+    - not_null
+  - name: month
+    tests:
+    - not_null

@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: int__serverless_credits
+  description: Unified view of all serverless feature credit usage.
+  columns:
+  - name: service_type
+    tests:
+    - not_null
+  - name: date
+    tests:
+    - not_null
+  - name: credits_used
+    tests:
+    - assert_positive_value: {}

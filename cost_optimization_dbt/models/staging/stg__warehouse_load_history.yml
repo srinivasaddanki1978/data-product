@@ -1,0 +1,13 @@
+version: 2
+models:
+- name: stg__warehouse_load_history
+  description: 5-minute interval warehouse load metrics.
+  columns:
+  - name: warehouse_name
+    description: Name of the warehouse.
+    tests:
+    - not_null
+  - name: start_time
+    description: Start of the 5-minute interval.
+    tests:
+    - not_null

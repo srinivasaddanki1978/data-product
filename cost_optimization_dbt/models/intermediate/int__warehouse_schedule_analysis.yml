@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__warehouse_schedule_analysis
+  description: Query volume by hour/day with off-peak savings potential.
+  columns:
+  - name: warehouse_name
+    tests:
+    - not_null

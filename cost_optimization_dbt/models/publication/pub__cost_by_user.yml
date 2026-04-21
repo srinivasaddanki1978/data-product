@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: pub__cost_by_user
+  description: Per-user cost summary with top 5 expensive queries. Powers Team Attribution.
+  columns:
+  - name: user_name
+    tests:
+    - unique
+    - not_null

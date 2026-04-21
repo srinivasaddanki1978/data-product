@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__alert_repeated_expensive
+  description: Detects repeated expensive queries exceeding daily threshold.
+  columns:
+  - name: alert_id
+    tests:
+    - not_null

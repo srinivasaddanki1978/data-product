@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: stg__serverless_task_history
+  description: Credit usage for serverless tasks.
+  columns:
+  - name: start_time
+    description: Start of the task execution interval.
+    tests:
+    - not_null

@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__antipattern_large_sort_no_limit
+  description: Queries with ORDER BY on >100K rows without LIMIT clause.
+  columns:
+  - name: query_id
+    tests:
+    - not_null

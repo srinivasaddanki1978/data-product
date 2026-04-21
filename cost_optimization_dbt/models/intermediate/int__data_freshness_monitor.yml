@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: int__data_freshness_monitor
+  description: Monitors staleness of key ACCOUNT_USAGE source tables.
+  columns:
+  - name: source_name
+    tests:
+    - unique
+    - not_null
+  - name: staleness_minutes
+    tests:
+    - not_null

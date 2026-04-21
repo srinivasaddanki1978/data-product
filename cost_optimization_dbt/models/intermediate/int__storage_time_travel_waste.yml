@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: int__storage_time_travel_waste
+  description: Tables where time travel storage exceeds active storage.
+  columns:
+  - name: table_name
+    tests:
+    - not_null
+  - name: estimated_savings_usd
+    tests:
+    - assert_positive_value: {}

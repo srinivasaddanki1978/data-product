@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: pub__weekly_executive_report
+  description: Single-row weekly executive summary for push-based email reporting.
+  columns:
+  - name: report_date
+    tests:
+    - not_null

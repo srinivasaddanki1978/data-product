@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__alert_cost_daily_spike
+  description: Detects when daily cost exceeds 2x the 30-day rolling average.
+  columns:
+  - name: alert_id
+    tests:
+    - not_null

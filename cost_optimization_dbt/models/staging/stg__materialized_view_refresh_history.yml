@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: stg__materialized_view_refresh_history
+  description: Credit usage for materialized view refreshes.
+  columns:
+  - name: start_time
+    description: Start of the refresh interval.
+    tests:
+    - not_null

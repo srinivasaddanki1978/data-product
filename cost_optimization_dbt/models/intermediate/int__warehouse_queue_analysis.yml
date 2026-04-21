@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__warehouse_queue_analysis
+  description: Hourly queue frequency analysis per warehouse.
+  columns:
+  - name: warehouse_name
+    tests:
+    - not_null

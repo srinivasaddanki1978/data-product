@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: int__query_patterns
+  description: Query execution patterns grouped by parameterized hash.
+  columns:
+  - name: query_hash
+    tests:
+    - not_null
+  - name: query_date
+    tests:
+    - not_null

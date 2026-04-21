@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: int__query_cost_attribution
+  description: Per-query cost estimation based on execution time and warehouse size.
+  columns:
+  - name: query_id
+    tests:
+    - unique
+    - not_null
+  - name: estimated_cost_usd
+    tests:
+    - assert_positive_value: {}

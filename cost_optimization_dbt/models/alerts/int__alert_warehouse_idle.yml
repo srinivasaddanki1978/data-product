@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__alert_warehouse_idle
+  description: Detects warehouses idle for more than the configured threshold.
+  columns:
+  - name: alert_id
+    tests:
+    - not_null

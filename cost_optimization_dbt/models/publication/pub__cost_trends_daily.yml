@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: pub__cost_trends_daily
+  description: Daily cost time series with anomaly flags. Powers Trend Analysis charts.
+  columns:
+  - name: date
+    tests:
+    - unique
+    - not_null

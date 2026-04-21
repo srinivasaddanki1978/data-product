@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: pub__warehouse_efficiency
+  description: Warehouse efficiency scores (0-100). Powers Warehouse Deep Dive.
+  columns:
+  - name: warehouse_name
+    tests:
+    - unique
+    - not_null
+  - name: efficiency_score
+    tests:
+    - assert_positive_value: {}

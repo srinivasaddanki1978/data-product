@@ -1,0 +1,16 @@
+version: 2
+models:
+- name: pub__data_freshness
+  description: Data source freshness with overall status for dashboard banner.
+  columns:
+  - name: source_name
+    tests:
+    - unique
+    - not_null
+  - name: freshness_status
+    tests:
+    - accepted_values:
+        values:
+        - FRESH
+        - STALE
+        - CRITICAL

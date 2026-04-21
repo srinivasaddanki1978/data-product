@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__storage_recommendations
+  description: Union of all storage optimization findings.
+  columns:
+  - name: recommendation_type
+    tests:
+    - not_null

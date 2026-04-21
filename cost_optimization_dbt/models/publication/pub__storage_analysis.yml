@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: pub__storage_analysis
+  description: Per-table storage breakdown with unused flags. Powers Storage Explorer.
+  columns:
+  - name: table_name
+    tests:
+    - not_null

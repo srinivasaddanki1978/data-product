@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: int__alert_state_tracker
+  description: 'Incremental alert state tracker with episode-based deduplication.
+    Assigns episode numbers and tracks new vs continuation alerts.
+
+    '
+  columns:
+  - name: alert_episode_key
+    tests:
+    - unique
+    - not_null
+  - name: alert_id
+    tests:
+    - not_null

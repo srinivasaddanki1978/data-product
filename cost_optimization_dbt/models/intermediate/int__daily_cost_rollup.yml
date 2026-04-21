@@ -1,0 +1,13 @@
+version: 2
+models:
+- name: int__daily_cost_rollup
+  description: Single daily cost table combining compute, storage, and serverless
+    with rolling averages.
+  columns:
+  - name: date
+    tests:
+    - unique
+    - not_null
+  - name: total_cost
+    tests:
+    - assert_positive_value: {}

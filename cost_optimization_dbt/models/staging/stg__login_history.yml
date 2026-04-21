@@ -1,0 +1,10 @@
+version: 2
+models:
+- name: stg__login_history
+  description: User login attempts and authentication events.
+  columns:
+  - name: event_id
+    description: Unique login event identifier.
+    tests:
+    - unique
+    - not_null

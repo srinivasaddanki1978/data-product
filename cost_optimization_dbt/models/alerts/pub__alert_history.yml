@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: pub__alert_history
+  description: Full audit trail of all fired alerts with send status.
+  columns:
+  - name: alert_episode_key
+    tests:
+    - unique:
+        config:
+          severity: warn
+    - not_null

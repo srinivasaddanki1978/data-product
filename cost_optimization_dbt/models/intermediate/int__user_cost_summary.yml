@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: int__user_cost_summary
+  description: Monthly aggregated cost per user with ranking.
+  columns:
+  - name: user_name
+    tests:
+    - not_null
+  - name: month
+    tests:
+    - not_null
+  - name: total_cost_usd
+    tests:
+    - assert_positive_value: {}

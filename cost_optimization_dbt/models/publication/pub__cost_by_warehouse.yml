@@ -1,0 +1,10 @@
+version: 2
+models:
+- name: pub__cost_by_warehouse
+  description: Per-warehouse cost, utilisation, and query stats. Powers Warehouse
+    Deep Dive.
+  columns:
+  - name: warehouse_name
+    tests:
+    - unique
+    - not_null

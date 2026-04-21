@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: pub__cost_forecast
+  description: Monthly aggregated cost forecasts with actuals for chart context and
+    annual projection.
+  columns:
+  - name: month
+    tests:
+    - not_null
+  - name: data_type
+    tests:
+    - accepted_values:
+        values:
+        - ACTUAL
+        - FORECAST

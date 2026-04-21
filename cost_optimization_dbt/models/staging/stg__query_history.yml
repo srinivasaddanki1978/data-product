@@ -1,0 +1,23 @@
+version: 2
+models:
+- name: stg__query_history
+  description: Cleaned query execution history from ACCOUNT_USAGE. Incremental on
+    end_time.
+  columns:
+  - name: query_id
+    description: Unique query identifier.
+    tests:
+    - unique
+    - not_null
+  - name: warehouse_name
+    description: Warehouse that executed the query.
+  - name: user_name
+    description: User who submitted the query.
+  - name: start_time
+    description: Query start timestamp.
+    tests:
+    - not_null
+  - name: end_time
+    description: Query end timestamp.
+    tests:
+    - not_null

@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__storage_clone_overhead
+  description: Tables with clone-retained storage overhead.
+  columns:
+  - name: table_name
+    tests:
+    - not_null

@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: int__team_cost_forecast
+  description: Per-team monthly cost forecast using linear regression. Requires 2+
+    months of data.
+  columns:
+  - name: team_name
+    tests:
+    - not_null
+  - name: forecast_month
+    tests:
+    - not_null

@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: stg__search_optimization_history
+  description: Credit usage for search optimization service.
+  columns:
+  - name: start_time
+    description: Start of the search optimization interval.
+    tests:
+    - not_null

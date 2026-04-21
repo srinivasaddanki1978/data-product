@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: int__idle_warehouse_periods
+  description: Detected idle warehouse periods with wasted credit estimates.
+  columns:
+  - name: warehouse_name
+    tests:
+    - not_null
+  - name: idle_duration_minutes
+    tests:
+    - assert_positive_value: {}

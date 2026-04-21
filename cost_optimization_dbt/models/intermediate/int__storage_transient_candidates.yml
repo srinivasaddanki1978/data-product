@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__storage_transient_candidates
+  description: Non-transient tables matching staging/temp patterns.
+  columns:
+  - name: table_name
+    tests:
+    - not_null

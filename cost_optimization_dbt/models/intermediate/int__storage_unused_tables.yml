@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: int__storage_unused_tables
+  description: Tables with 0 reads in 90+ days.
+  columns:
+  - name: table_name
+    tests:
+    - not_null
+  - name: savings_if_dropped_usd
+    tests:
+    - assert_positive_value: {}

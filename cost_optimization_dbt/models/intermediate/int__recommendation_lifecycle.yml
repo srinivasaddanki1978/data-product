@@ -1,0 +1,19 @@
+version: 2
+models:
+- name: int__recommendation_lifecycle
+  description: Recommendation lifecycle tracking with ROI computation for implemented
+    items.
+  columns:
+  - name: recommendation_id
+    tests:
+    - unique
+    - not_null
+  - name: status
+    tests:
+    - accepted_values:
+        values:
+        - OPEN
+        - ACCEPTED
+        - IMPLEMENTED
+        - REJECTED
+        - DEFERRED

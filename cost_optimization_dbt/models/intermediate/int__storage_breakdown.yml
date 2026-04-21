@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: int__storage_breakdown
+  description: Per-table storage breakdown with last access date.
+  columns:
+  - name: database_name
+    tests:
+    - not_null
+  - name: table_name
+    tests:
+    - not_null

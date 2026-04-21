@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: stg__automatic_clustering_history
+  description: Credit usage for automatic clustering operations.
+  columns:
+  - name: start_time
+    description: Start of the clustering interval.
+    tests:
+    - not_null

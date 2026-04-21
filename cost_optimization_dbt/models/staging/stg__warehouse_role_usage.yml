@@ -1,0 +1,21 @@
+version: 2
+models:
+- name: stg__warehouse_role_usage
+  description: 'Dynamically extracted warehouse-to-role-to-user mapping from ACCOUNT_USAGE.
+    Derives team attribution from actual query execution patterns instead of static
+    seed files.
+
+    '
+  columns:
+  - name: warehouse_name
+    description: Warehouse used for query execution.
+    tests:
+    - not_null
+  - name: role_name
+    description: Role used to run the query.
+    tests:
+    - not_null
+  - name: user_name
+    description: User who executed the query.
+    tests:
+    - not_null

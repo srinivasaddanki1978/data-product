@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__antipattern_repeated_queries
+  description: Same query hash running >10 times/day with significant cost.
+  columns:
+  - name: query_id
+    tests:
+    - not_null

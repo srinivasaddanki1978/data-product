@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: stg__warehouse_metering_history
+  description: Hourly credit consumption per warehouse.
+  columns:
+  - name: warehouse_name
+    description: Name of the warehouse.
+    tests:
+    - not_null
+  - name: start_time
+    description: Start of the metering hour.
+    tests:
+    - not_null
+  - name: credits_used
+    description: Total credits consumed in this interval.

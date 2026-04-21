@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: pub__antipattern_summary
+  description: Aggregate anti-pattern statistics with 30-day trends.
+  columns:
+  - name: antipattern_type
+    tests:
+    - unique
+    - not_null

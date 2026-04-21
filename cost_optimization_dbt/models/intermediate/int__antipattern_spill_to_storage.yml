@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__antipattern_spill_to_storage
+  description: Queries spilling to local or remote storage.
+  columns:
+  - name: query_id
+    tests:
+    - not_null

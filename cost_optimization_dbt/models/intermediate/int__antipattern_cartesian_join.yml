@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: int__antipattern_cartesian_join
+  description: Queries producing disproportionately more rows than scanned (cartesian
+    join indicator).
+  columns:
+  - name: query_id
+    tests:
+    - not_null

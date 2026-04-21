@@ -1,0 +1,13 @@
+version: 2
+models:
+- name: pub__cost_summary
+  description: Monthly cost summary with MoM change percentages. Powers Executive
+    Summary.
+  columns:
+  - name: month
+    tests:
+    - unique
+    - not_null
+  - name: total_cost
+    tests:
+    - assert_positive_value: {}

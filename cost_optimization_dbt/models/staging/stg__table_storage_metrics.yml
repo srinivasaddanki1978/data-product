@@ -1,0 +1,11 @@
+version: 2
+models:
+- name: stg__table_storage_metrics
+  description: Current storage metrics per table.
+  columns:
+  - name: table_id
+    description: Internal Snowflake table ID.
+    tests:
+    - not_null
+  - name: table_name
+    description: Name of the table.

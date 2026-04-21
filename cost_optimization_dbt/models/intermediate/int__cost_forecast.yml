@@ -1,0 +1,13 @@
+version: 2
+models:
+- name: int__cost_forecast
+  description: 90-day daily cost forecast using linear regression on last 90 days
+    of actuals.
+  columns:
+  - name: forecast_date
+    tests:
+    - unique
+    - not_null
+  - name: predicted_total_cost
+    tests:
+    - not_null

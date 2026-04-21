@@ -1,0 +1,9 @@
+version: 2
+models:
+- name: stg__access_history
+  description: Object access audit trail per query.
+  columns:
+  - name: query_id
+    description: Query that accessed the objects.
+    tests:
+    - not_null

@@ -1,0 +1,16 @@
+version: 2
+models:
+- name: int__cost_seasonality_baseline
+  description: Day-of-week and month-end cost baselines with trend adjustment for
+    seasonality-aware anomaly detection.
+  columns:
+  - name: date
+    tests:
+    - unique
+    - not_null
+  - name: adjusted_baseline
+    tests:
+    - not_null
+  - name: effective_stddev
+    tests:
+    - not_null

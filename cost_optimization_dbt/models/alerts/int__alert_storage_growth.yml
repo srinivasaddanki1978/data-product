@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__alert_storage_growth
+  description: Detects databases with storage growth exceeding threshold WoW.
+  columns:
+  - name: alert_id
+    tests:
+    - not_null

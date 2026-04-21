@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: int__warehouse_auto_suspend_analysis
+  description: Optimal auto-suspend setting analysis per warehouse.
+  columns:
+  - name: warehouse_name
+    tests:
+    - unique
+    - not_null
+  - name: potential_savings_usd
+    tests:
+    - assert_positive_value: {}

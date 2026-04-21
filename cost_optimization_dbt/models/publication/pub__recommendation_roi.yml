@@ -1,0 +1,19 @@
+version: 2
+models:
+- name: pub__recommendation_roi
+  description: Recommendation ROI detail with funnel aggregation. Powers ROI Dashboard
+    tab.
+  columns:
+  - name: recommendation_id
+    tests:
+    - unique
+    - not_null
+  - name: status
+    tests:
+    - accepted_values:
+        values:
+        - OPEN
+        - ACCEPTED
+        - IMPLEMENTED
+        - REJECTED
+        - DEFERRED

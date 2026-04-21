@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: int__warehouse_daily_credits
+  description: Daily credit consumption and cost per warehouse.
+  columns:
+  - name: warehouse_name
+    tests:
+    - not_null
+  - name: date
+    tests:
+    - not_null
+  - name: estimated_cost_usd
+    tests:
+    - assert_positive_value: {}

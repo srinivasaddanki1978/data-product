@@ -1,0 +1,40 @@
+version: 2
+models:
+- name: pub__all_recommendations
+  description: 'Master unified recommendations across warehouse, query, and storage
+    categories. Ranked by priority_score. This is the ''money page'' data source.
+
+    '
+  columns:
+  - name: recommendation_id
+    tests:
+    - unique
+    - not_null
+  - name: overall_rank
+    tests:
+    - unique
+    - not_null
+  - name: estimated_monthly_savings_usd
+    tests:
+    - assert_positive_value: {}
+  - name: category
+    tests:
+    - accepted_values:
+        values:
+        - WAREHOUSE
+        - QUERY
+        - STORAGE
+  - name: effort
+    tests:
+    - accepted_values:
+        values:
+        - LOW
+        - MEDIUM
+        - HIGH
+  - name: confidence
+    tests:
+    - accepted_values:
+        values:
+        - LOW
+        - MEDIUM
+        - HIGH

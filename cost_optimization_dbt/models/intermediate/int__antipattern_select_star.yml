@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__antipattern_select_star
+  description: Queries using SELECT * pattern.
+  columns:
+  - name: query_id
+    tests:
+    - not_null
