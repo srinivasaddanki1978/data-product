@@ -365,6 +365,69 @@ No additional software licences, external infrastructure, or ongoing subscriptio
 
 ---
 
+## Deployment Steps
+
+### Step 1: Git Repository Integration in Snowflake
+
+The dbt project is deployed to Snowflake via native Git integration. This allows Snowflake to pull the latest code directly from the repository.
+
+```sql
+-- Create Git Repository (reuses existing API integration and credentials)
+CREATE GIT REPOSITORY COST_OPTIMIZATION_DB.PUBLIC.cost_optimization_repo
+  API_INTEGRATION = GLOBALMART_GIT_INTEGRATION
+  GIT_CREDENTIALS = GLOBALMART.RAW.GIT_SECRET
+  ORIGIN = 'https://github.com/srinivasaddanki1978/data-product.git';
+```
+
+Alternatively, via Snowflake UI:
+1. Navigate to **Projects** → **dbt Projects** → click **"Add New"**
+2. Select **"Create from Git Repository"**
+3. Repository URL: `https://github.com/srinivasaddanki1978/data-product.git`
+4. API Integration: `GLOBALMART_GIT_INTEGRATION`
+5. dbt project subdirectory: `cost_optimization_dbt`
+
+### Step 2: Deploy and Run the dbt Project
+
+```bash
+# Deploy (uploads project to Snowflake)
+snow dbt deploy cost_optimization --force
+
+# Load reference data (credit pricing, alert config, budgets)
+snow dbt execute cost_optimization seed
+
+# Run all 72 models (staging → intermediate → publication → alerts)
+snow dbt execute cost_optimization run
+
+# Validate data quality
+snow dbt execute cost_optimization test
+```
+
+### Step 3: Automated Daily Refresh Schedule
+
+Three Snowflake Tasks refresh the pipeline throughout the business day:
+
+| Task | Schedule (IST) | CRON (UTC) | Purpose |
+|------|---------------|------------|---------|
+| `refresh_cost_models_morning` | 10:30 AM | `0 5 * * *` | Captures data through ~9:45 AM |
+| `refresh_cost_models_midday` | 1:00 PM | `30 7 * * *` | Captures data through ~12:15 PM |
+| `refresh_cost_models_afternoon` | 4:00 PM | `30 10 * * *` | Captures data through ~3:15 PM |
+
+Enable the tasks:
+```sql
+ALTER TASK refresh_cost_models_morning RESUME;
+ALTER TASK refresh_cost_models_midday RESUME;
+ALTER TASK refresh_cost_models_afternoon RESUME;
+```
+
+### Step 4: Deploy Streamlit Dashboard
+
+```bash
+cd streamlit_app
+snow streamlit deploy --connection cost_optimization
+```
+
+---
+
 ## Summary
 
 The Snowflake Cost Optimisation Framework transforms Snowflake's built-in metadata from raw operational data into a strategic asset for cost management. It answers the questions that matter — who is spending how much, why costs are growing, what is being wasted, and what to do about it — and delivers those answers through an interactive dashboard, automated alerts, and a prioritised savings report.

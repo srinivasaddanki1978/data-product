@@ -7,7 +7,7 @@ Connect-token-secret.txt
 cost_optimization_dbt/target/
 cost_optimization_dbt/dbt_packages/
 cost_optimization_dbt/logs/
-cost_optimization_dbt/profiles.yml
+# profiles.yml is committed (safe — no credentials, uses Snowflake native auth)
 
 # Python
 __pycache__/

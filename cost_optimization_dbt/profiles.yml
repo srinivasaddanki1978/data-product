@@ -1,0 +1,13 @@
+cost_optimization:
+  target: prod
+  outputs:
+    prod:
+      type: snowflake
+      account: chc70950.us-east-1
+      user: SRINIVAS
+      role: ACCOUNTADMIN
+      warehouse: COST_OPT_WH
+      database: COST_OPTIMIZATION_DB
+      schema: PUBLIC
+      authenticator: programmatic_access_token
+      token: "{{ env_var('SNOWFLAKE_TOKEN', '') }}"
