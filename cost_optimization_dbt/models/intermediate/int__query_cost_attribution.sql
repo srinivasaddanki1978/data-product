@@ -31,19 +31,27 @@ WITH queries AS (
 
 -- Derive credits_per_hour from the warehouse_size column in query_history.
 -- This is Snowflake-standard pricing per size — no seed file needed.
+-- Use one canonical UPPER value per size to avoid join duplicates.
 wh_credits AS (
     SELECT column1 AS warehouse_size, column2 AS credits_per_hour
     FROM (VALUES
-        ('X-Small', 1), ('X-SMALL', 1), ('XSMALL', 1),
-        ('Small', 2), ('SMALL', 2),
-        ('Medium', 4), ('MEDIUM', 4),
-        ('Large', 8), ('LARGE', 8),
-        ('X-Large', 16), ('X-LARGE', 16), ('XLARGE', 16),
-        ('2X-Large', 32), ('2X-LARGE', 32), ('2XLARGE', 32),
-        ('3X-Large', 64), ('3X-LARGE', 64), ('3XLARGE', 64),
-        ('4X-Large', 128), ('4X-LARGE', 128), ('4XLARGE', 128),
-        ('5X-Large', 256), ('5X-LARGE', 256), ('5XLARGE', 256),
-        ('6X-Large', 512), ('6X-LARGE', 512), ('6XLARGE', 512)
+        ('X-SMALL', 1),
+        ('XSMALL', 1),
+        ('SMALL', 2),
+        ('MEDIUM', 4),
+        ('LARGE', 8),
+        ('X-LARGE', 16),
+        ('XLARGE', 16),
+        ('2X-LARGE', 32),
+        ('2XLARGE', 32),
+        ('3X-LARGE', 64),
+        ('3XLARGE', 64),
+        ('4X-LARGE', 128),
+        ('4XLARGE', 128),
+        ('5X-LARGE', 256),
+        ('5XLARGE', 256),
+        ('6X-LARGE', 512),
+        ('6XLARGE', 512)
     )
 ),
 
