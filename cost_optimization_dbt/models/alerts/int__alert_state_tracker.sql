@@ -18,6 +18,7 @@ WITH current_alerts AS (
         details_json,
         alert_id || '||' || resource_key AS alert_resource_key
     FROM {{ ref('int__alert_union_all') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY alert_id, resource_key ORDER BY detected_at DESC) = 1
 ),
 
 {% if is_incremental() %}
