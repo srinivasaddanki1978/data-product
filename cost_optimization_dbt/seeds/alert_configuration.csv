@@ -4,5 +4,5 @@ warehouse_idle_extended,Warehouse Idle,Warehouse running with 0 queries for >30 
 credit_budget_80pct,Budget 80% Warning,Monthly credits approaching 80% of budget,P1,TRUE,finance-alerts,60,80,percentage,finance-team,TRUE,,FALSE
 credit_budget_100pct,Budget Exceeded,Monthly credits exceeded 100% of budget,P0,TRUE,finance-alerts,60,100,percentage,finance-team,TRUE,,FALSE
 query_spill_heavy,Heavy Query Spill,Queries spilling >1GB to remote storage,P2,TRUE,cost-alerts,30,1073741824,bytes,platform-team,TRUE,,TRUE
-storage_growth_anomaly,Storage Spike,Database storage grew >20% week-over-week,P3,FALSE,cost-alerts,1440,20,percentage,data-team,TRUE,,TRUE
+storage_growth_anomaly,Storage Spike,Database storage grew >20% week-over-week,P3,TRUE,cost-alerts,1440,20,percentage,data-team,TRUE,,TRUE
 repeated_expensive_query,Repeated Expensive Query,Same query hash running >20 times/day costing >$1 each,P2,TRUE,cost-alerts,60,20,count,platform-team,TRUE,,TRUE
