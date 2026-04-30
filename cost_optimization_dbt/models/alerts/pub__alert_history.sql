@@ -26,6 +26,7 @@ payload AS (
         api_response_code,
         send_success
     FROM {{ ref('pub__teams_alert_payload') }}
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY alert_episode_key ORDER BY sent_at DESC NULLS LAST) = 1
 )
 
 SELECT
