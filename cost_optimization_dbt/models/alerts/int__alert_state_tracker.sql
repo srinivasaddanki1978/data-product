@@ -87,3 +87,7 @@ SELECT
     episode_number,
     CURRENT_TIMESTAMP() AS evaluated_at
 FROM enriched
+QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY alert_id || '_episode_' || episode_number || '_' || resource_key
+    ORDER BY detected_at DESC
+) = 1

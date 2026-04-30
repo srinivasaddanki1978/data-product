@@ -47,3 +47,4 @@ SELECT
 FROM growth g
 CROSS JOIN config c
 WHERE g.growth_pct > c.threshold_value
+QUALIFY ROW_NUMBER() OVER (PARTITION BY g.database_name ORDER BY g.usage_date DESC) = 1
