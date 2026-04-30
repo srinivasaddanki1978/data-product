@@ -13,11 +13,18 @@ clean-targets:
   - "dbt_packages"
 
 on-run-end:
-  - "{% if execute and flags.WHICH in ('run', 'build') %}BEGIN CALL send_teams_alerts(); EXCEPTION WHEN OTHER THEN RETURN 'send_teams_alerts not deployed yet'; END;{% endif %}"
+  - "{{ call_send_teams_alerts() }}"
 
 seeds:
   cost_optimization:
     +schema: SEEDS
+    alert_suppressions:
+      +column_types:
+        start_date: date
+        end_date: date
+    bank_holidays:
+      +column_types:
+        holiday_date: date
 
 models:
   cost_optimization:
