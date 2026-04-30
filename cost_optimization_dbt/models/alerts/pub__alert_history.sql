@@ -26,14 +26,6 @@ payload AS (
         api_response_code,
         send_success
     FROM {{ ref('pub__teams_alert_payload') }}
-),
-
-union_all AS (
-    SELECT
-        alert_id,
-        is_suppressed,
-        suppression_reason
-    FROM {{ ref('int__alert_union_all') }}
 )
 
 SELECT
@@ -53,12 +45,11 @@ SELECT
     c.teams_enabled,
     c.enabled AS alert_enabled,
     c.resolver_team,
-    COALESCE(u.is_suppressed, FALSE) AS is_suppressed,
-    u.suppression_reason,
+    FALSE AS is_suppressed,
+    NULL AS suppression_reason,
     p.sent_at AS teams_sent_at,
     p.api_response_code AS teams_response_code,
     p.send_success AS teams_send_success
 FROM tracker t
 LEFT JOIN config c ON t.alert_id = c.alert_id
 LEFT JOIN payload p ON t.alert_episode_key = p.alert_episode_key
-LEFT JOIN union_all u ON t.alert_id = u.alert_id
