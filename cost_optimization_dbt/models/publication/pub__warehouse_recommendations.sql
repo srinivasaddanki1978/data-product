@@ -88,28 +88,35 @@ all_recs AS (
     SELECT * FROM suspend_recs
     UNION ALL
     SELECT * FROM schedule_recs
+),
+
+-- Only recommend for warehouses with metering data
+metered_warehouses AS (
+    SELECT DISTINCT warehouse_name
+    FROM {{ ref('stg__warehouse_metering_history') }}
 )
 
 SELECT
-    warehouse_name,
-    recommendation_type,
-    current_state,
-    recommended_state,
-    estimated_monthly_savings_usd,
-    effort,
-    confidence,
-    evidence,
+    r.warehouse_name,
+    r.recommendation_type,
+    r.current_state,
+    r.recommended_state,
+    r.estimated_monthly_savings_usd,
+    r.effort,
+    r.confidence,
+    r.evidence,
     -- Priority: savings x confidence / effort
-    estimated_monthly_savings_usd
-        * CASE confidence WHEN 'HIGH' THEN 3 WHEN 'MEDIUM' THEN 2 ELSE 1 END
-        / CASE effort WHEN 'LOW' THEN 1 WHEN 'MEDIUM' THEN 2 ELSE 3 END
+    r.estimated_monthly_savings_usd
+        * CASE r.confidence WHEN 'HIGH' THEN 3 WHEN 'MEDIUM' THEN 2 ELSE 1 END
+        / CASE r.effort WHEN 'LOW' THEN 1 WHEN 'MEDIUM' THEN 2 ELSE 3 END
     AS priority_score,
     -- SQL to apply
-    CASE recommendation_type
-        WHEN 'RESIZE' THEN 'ALTER WAREHOUSE ' || warehouse_name || ' SET WAREHOUSE_SIZE = ''' || recommended_state || ''';'
-        WHEN 'AUTO_SUSPEND' THEN 'ALTER WAREHOUSE ' || warehouse_name || ' SET AUTO_SUSPEND = ' || recommended_state || ';'
-        WHEN 'SCHEDULE' THEN '-- Create a resource monitor or task to suspend ' || warehouse_name || ' during off-peak hours'
+    CASE r.recommendation_type
+        WHEN 'RESIZE' THEN 'ALTER WAREHOUSE ' || r.warehouse_name || ' SET WAREHOUSE_SIZE = ''' || r.recommended_state || ''';'
+        WHEN 'AUTO_SUSPEND' THEN 'ALTER WAREHOUSE ' || r.warehouse_name || ' SET AUTO_SUSPEND = ' || r.recommended_state || ';'
+        WHEN 'SCHEDULE' THEN '-- Create a resource monitor or task to suspend ' || r.warehouse_name || ' during off-peak hours'
         ELSE '-- Manual review required'
     END AS sql_to_apply
-FROM all_recs
+FROM all_recs r
+INNER JOIN metered_warehouses mw ON r.warehouse_name = mw.warehouse_name
 ORDER BY priority_score DESC

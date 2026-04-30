@@ -18,6 +18,7 @@ WITH storage AS (
         last_altered
     FROM {{ ref('stg__table_storage_metrics') }}
     WHERE table_dropped IS NULL
+      AND database_name IS NOT NULL
 ),
 
 -- Get last read date from access_history
