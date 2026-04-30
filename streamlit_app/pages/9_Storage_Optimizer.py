@@ -49,17 +49,17 @@ try:
     # ── Unused tables ────────────────────────────────────────────────
     if not df_unused.empty:
         st.subheader(f"Unused Tables — {len(df_unused)} found")
-        st.dataframe(df_unused, use_container_width=True, hide_index=True)
+        st.dataframe(df_unused, use_container_width=True)
 
     # ── TT waste candidates ──────────────────────────────────────────
     if not df_tt_waste.empty:
         st.subheader(f"Time Travel Waste — {len(df_tt_waste)} tables")
-        st.dataframe(df_tt_waste, use_container_width=True, hide_index=True)
+        st.dataframe(df_tt_waste, use_container_width=True)
 
     # ── Transient candidates ─────────────────────────────────────────
     if not df_transient.empty:
         st.subheader(f"Transient Table Candidates — {len(df_transient)} tables")
-        st.dataframe(df_transient, use_container_width=True, hide_index=True)
+        st.dataframe(df_transient, use_container_width=True)
 
 except Exception as e:
     st.error(f"Error loading storage optimizer: {e}")

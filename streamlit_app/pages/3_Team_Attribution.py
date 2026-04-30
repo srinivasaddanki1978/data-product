@@ -38,7 +38,7 @@ try:
 
         if selected_team != "All":
             team_data = df_team[df_team["TEAM_NAME"] == selected_team]
-            st.dataframe(team_data, use_container_width=True, hide_index=True)
+            st.dataframe(team_data, use_container_width=True)
 
         # ── Percentage contribution pie ──────────────────────────────
         fig_pie = px.pie(
@@ -55,7 +55,7 @@ try:
         st.dataframe(
             df_users[["USER_NAME", "TOTAL_QUERIES", "TOTAL_COST_USD",
                        "AVG_COST_PER_QUERY", "OVERALL_COST_RANK"]].head(20),
-            use_container_width=True, hide_index=True,
+            use_container_width=True,
         )
 
     # ── Cost by query type ───────────────────────────────────────────

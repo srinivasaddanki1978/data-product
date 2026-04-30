@@ -105,7 +105,7 @@ try:
             teams = df_team["TEAM_NAME"].unique().tolist()
             selected_teams = st.multiselect("Filter Teams", teams, default=teams)
             df_team_filtered = df_team[df_team["TEAM_NAME"].isin(selected_teams)]
-            st.dataframe(df_team_filtered, use_container_width=True, hide_index=True)
+            st.dataframe(df_team_filtered, use_container_width=True)
         else:
             st.info("Team forecast requires at least 2 months of data per team.")
 

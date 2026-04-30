@@ -96,8 +96,7 @@ try:
 
             st.dataframe(
                 df_filtered[display_cols],
-                use_container_width=True, hide_index=True,
-            )
+                use_container_width=True,            )
 
             # ── CSV Export ─────────────────────────────────────────
             csv = df_filtered.to_csv(index=False)
@@ -162,8 +161,7 @@ try:
                     df_impl[["RECOMMENDATION_ID", "CATEGORY", "TARGET_OBJECT",
                              "ESTIMATED_MONTHLY_SAVINGS_USD", "ACTUAL_SAVINGS_USD",
                              "ROI_PCT", "DAYS_SINCE_IMPLEMENTATION", "NOTES"]],
-                    use_container_width=True, hide_index=True,
-                )
+                    use_container_width=True,                )
             else:
                 st.info("No recommendations have been implemented yet. "
                         "Update `recommendation_actions.csv` and re-run `dbt seed` to track progress.")

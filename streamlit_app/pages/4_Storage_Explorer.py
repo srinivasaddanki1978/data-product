@@ -41,7 +41,7 @@ try:
                         "ACTIVE_TB", "TIME_TRAVEL_TB", "FAILSAFE_TB",
                         "TOTAL_TB", "ESTIMATED_MONTHLY_COST_USD",
                         "DAYS_SINCE_LAST_READ", "IS_UNUSED"]].head(50),
-            use_container_width=True, hide_index=True,
+            use_container_width=True,
         )
 
         # ── Unused tables (90+ days no reads) ────────────────────────
@@ -52,7 +52,7 @@ try:
                 df_unused[["DATABASE_NAME", "SCHEMA_NAME", "TABLE_NAME",
                             "TOTAL_TB", "ESTIMATED_MONTHLY_COST_USD",
                             "DAYS_SINCE_LAST_READ"]],
-                use_container_width=True, hide_index=True,
+                use_container_width=True,
             )
             unused_cost = df_unused["ESTIMATED_MONTHLY_COST_USD"].sum()
             st.warning(f"Total monthly cost of unused tables: {format_currency(unused_cost)}")
@@ -65,7 +65,7 @@ try:
             st.dataframe(
                 df_tt_waste[["DATABASE_NAME", "TABLE_NAME",
                               "ACTIVE_TB", "TIME_TRAVEL_TB"]],
-                use_container_width=True, hide_index=True,
+                use_container_width=True,
             )
 
 except Exception as e:

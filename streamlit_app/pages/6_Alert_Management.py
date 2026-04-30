@@ -16,7 +16,7 @@ try:
     st.subheader("Alert Configurations")
     df_config = run_query(f"SELECT * FROM {SEEDS}.ALERT_CONFIGURATION ORDER BY severity")
     if not df_config.empty:
-        st.dataframe(df_config, use_container_width=True, hide_index=True)
+        st.dataframe(df_config, use_container_width=True)
 
     # ── Pipeline Health ──────────────────────────────────────────────
     st.subheader("Pipeline Health")
@@ -73,7 +73,7 @@ alert_configuration).
         LIMIT 50
     """)
     if not df_history.empty:
-        st.dataframe(df_history, use_container_width=True, hide_index=True)
+        st.dataframe(df_history, use_container_width=True)
     else:
         st.info("No alerts in history.")
 
@@ -104,7 +104,7 @@ alert_configuration).
         ORDER BY STALENESS_MINUTES DESC
     """)
     if not df_freshness.empty:
-        st.dataframe(df_freshness, use_container_width=True, hide_index=True)
+        st.dataframe(df_freshness, use_container_width=True)
     else:
         st.info("Data freshness information not available. Run the dbt pipeline to generate freshness data.")
 

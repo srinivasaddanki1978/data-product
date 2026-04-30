@@ -74,7 +74,7 @@ try:
             df_filtered[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
                           "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
                           "RECOMMENDATION", "SAMPLE_QUERY_TEXT"]],
-            use_container_width=True, hide_index=True,
+            use_container_width=True,
         )
     else:
         st.info("No anti-patterns detected. Queries are running efficiently.")

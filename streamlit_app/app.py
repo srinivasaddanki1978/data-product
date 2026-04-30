@@ -77,7 +77,6 @@ try:
             df[["MONTH", "TOTAL_COST", "COMPUTE_COST", "STORAGE_COST",
                 "SERVERLESS_COST", "MOM_CHANGE_PCT"]].head(6),
             use_container_width=True,
-            hide_index=True,
         )
     else:
         st.warning("No cost data available. Please run the dbt pipeline first.")

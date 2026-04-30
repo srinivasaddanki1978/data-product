@@ -43,7 +43,7 @@ try:
         weekly_agg = df_weekly.groupby("WEEK")[["TOTAL_COST", "COMPUTE_COST",
                                                  "STORAGE_COST", "SERVERLESS_COST"]].sum()
         weekly_agg = weekly_agg.reset_index().tail(12)
-        st.dataframe(weekly_agg, use_container_width=True, hide_index=True)
+        st.dataframe(weekly_agg, use_container_width=True)
 
         # ── Anomaly detection highlights ─────────────────────────────
         st.subheader("Anomaly Days")
@@ -52,7 +52,7 @@ try:
             st.warning(f"{len(df_anomalies)} anomaly days detected (cost > 2x baseline)")
             st.dataframe(
                 df_anomalies[["DATE", "TOTAL_COST", "ROLLING_30D_AVG"]],
-                use_container_width=True, hide_index=True,
+                use_container_width=True,
             )
         else:
             st.success("No anomalies detected in the selected period.")

@@ -73,7 +73,7 @@ try:
         st.subheader("Idle Periods")
         df_idle = run_query(IDLE_PERIODS.format(warehouse=selected_wh))
         if not df_idle.empty:
-            st.dataframe(df_idle, use_container_width=True, hide_index=True)
+            st.dataframe(df_idle, use_container_width=True)
         else:
             st.success("No significant idle periods detected.")
 

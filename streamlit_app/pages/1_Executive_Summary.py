@@ -63,13 +63,13 @@ try:
         st.subheader("Top 5 Warehouses by Cost")
         df_wh = run_query(TOP_WAREHOUSES)
         if not df_wh.empty:
-            st.dataframe(df_wh, use_container_width=True, hide_index=True)
+            st.dataframe(df_wh, use_container_width=True)
 
     with col2:
         st.subheader("Top 5 Users by Cost")
         df_usr = run_query(TOP_USERS)
         if not df_usr.empty:
-            st.dataframe(df_usr, use_container_width=True, hide_index=True)
+            st.dataframe(df_usr, use_container_width=True)
 
 except Exception as e:
     st.error(f"Error loading executive summary: {e}")
