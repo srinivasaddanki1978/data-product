@@ -1,0 +1,39 @@
+version: 2
+seeds:
+- name: alert_suppressions
+  description: >
+    Targeted alert suppression rules. Each row silences a specific alert_id
+    for a specific resource during the given date range. Used to prevent
+    false positives during maintenance windows or known noisy periods.
+  columns:
+  - name: alert_id
+    description: Alert identifier matching alert_configuration.alert_id
+    tests:
+    - not_null
+    - relationships:
+        to: ref('alert_configuration')
+        field: alert_id
+        config:
+          severity: warn
+  - name: resource_value
+    description: >
+      The resource_key value to suppress (e.g., warehouse name, database name).
+      Must match the resource_key emitted by the detection model.
+    tests:
+    - not_null
+  - name: suppression_reason
+    description: Human-readable reason for the suppression
+    tests:
+    - not_null
+  - name: created_by
+    description: Person or team who created the suppression rule
+    tests:
+    - not_null
+  - name: start_date
+    description: Start date of the suppression window (inclusive)
+    tests:
+    - not_null
+  - name: end_date
+    description: End date of the suppression window (inclusive)
+    tests:
+    - not_null

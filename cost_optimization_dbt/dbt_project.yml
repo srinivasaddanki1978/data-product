@@ -12,6 +12,9 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+on-run-end:
+  - "CALL send_teams_alerts()"
+
 seeds:
   cost_optimization:
     +schema: SEEDS

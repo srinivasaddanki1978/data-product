@@ -1,11 +1,35 @@
 version: 2
 models:
 - name: int__alert_union_all
-  description: Union of all alert detection models in standardized schema.
+  description: >
+    Union of all alert detection models in standardized schema, with
+    suppression filtering. Alerts matching an active suppression rule
+    or falling on a bank holiday (when suppress_on_holidays is enabled)
+    are excluded so they never reach the state tracker.
   columns:
   - name: alert_id
+    description: Alert type identifier from the detection model
     tests:
     - not_null
   - name: detected_at
+    description: Timestamp when the alert condition was detected
     tests:
     - not_null
+  - name: resource_key
+    description: The resource (warehouse, database, query hash) that triggered the alert
+  - name: metric_value
+    description: The observed metric value that breached the threshold
+  - name: threshold_value
+    description: The configured threshold that was exceeded
+  - name: details_json
+    description: JSON payload with additional alert context
+  - name: is_suppressed
+    description: >
+      Boolean flag indicating whether the alert was suppressed. Always
+      FALSE in this model since suppressed rows are filtered out, but
+      retained for downstream audit trail in pub__alert_history.
+  - name: suppression_reason
+    description: >
+      Human-readable reason the alert was suppressed. NULL for active
+      alerts. Populated with suppression rule reason or bank holiday
+      description when the alert is suppressed.

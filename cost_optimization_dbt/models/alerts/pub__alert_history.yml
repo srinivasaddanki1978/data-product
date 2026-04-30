@@ -1,7 +1,10 @@
 version: 2
 models:
 - name: pub__alert_history
-  description: Full audit trail of all fired alerts with send status.
+  description: >
+    Full audit trail of all fired alerts with send status and suppression
+    information. Includes is_suppressed and suppression_reason columns
+    for visibility into why alerts were or were not actioned.
   columns:
   - name: alert_episode_key
     tests:
@@ -9,3 +12,7 @@ models:
         config:
           severity: warn
     - not_null
+  - name: is_suppressed
+    description: Whether this alert was suppressed by a rule or bank holiday
+  - name: suppression_reason
+    description: Human-readable reason for suppression (NULL if not suppressed)

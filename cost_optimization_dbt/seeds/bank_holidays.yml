@@ -1,0 +1,26 @@
+version: 2
+seeds:
+- name: bank_holidays
+  description: >
+    Bank holidays calendar used to suppress non-critical alerts on days
+    when reduced activity is expected. Pre-populated with Indian bank
+    holidays for 2025-2026 (Bilvantis is India-based). Region column
+    supports future multi-region filtering.
+  columns:
+  - name: holiday_date
+    description: Date of the bank holiday
+    tests:
+    - not_null
+    - unique
+  - name: description
+    description: Human-readable name of the holiday
+    tests:
+    - not_null
+  - name: region
+    description: ISO country code for the region (e.g., IN for India)
+    tests:
+    - not_null
+    - accepted_values:
+        values: ['IN']
+        config:
+          severity: warn
