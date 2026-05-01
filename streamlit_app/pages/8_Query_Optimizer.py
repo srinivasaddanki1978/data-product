@@ -74,11 +74,6 @@ try:
             df_filtered[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
                           "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
                           "RECOMMENDATION", "SAMPLE_QUERY_TEXT"]],
-            column_config={
-                "SAMPLE_QUERY_TEXT": st.column_config.TextColumn(
-                    "Query", width="large", help="Click cell to view full SQL"
-                ),
-            },
             use_container_width=True,
             height=500,
         )
