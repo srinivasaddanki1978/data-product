@@ -105,10 +105,25 @@ snow sql --connection cost_optimization --enable-templating NONE \
 
 ### 4. Deploy Streamlit Dashboard
 
+**Option A: Snowflake CLI**
+
 ```bash
 cd streamlit_app
 snow streamlit deploy --connection cost_optimization
 ```
+
+> **Note**: `snow streamlit deploy` may fail with certain account formats (e.g., `chc70950.us-east-1`). If so, use Option B.
+
+**Option B: deploy_sis.py (recommended)**
+
+Automated deployment script that bypasses `snow streamlit deploy` using direct Snowpark PUT + CREATE STREAMLIT commands.
+
+```bash
+cd streamlit_app
+python deploy_sis.py
+```
+
+Reads connection config from `~/.snowflake/connections.toml`, uploads all files with cache-busting timestamps, and creates the Streamlit app. Requires `snowflake-snowpark-python`.
 
 ## dbt Model Layers
 

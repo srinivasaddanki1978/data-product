@@ -44,6 +44,7 @@ data-product/
 │
 └── streamlit_app/                           # Streamlit-in-Snowflake dashboard
     ├── app.py                               # Main entry: KPIs + cost donut
+    ├── deploy_sis.py                        # Automated SiS deployment script
     ├── pages/                               # 10 interactive pages
     │   ├── 1_Executive_Summary.py
     │   ├── 2_Warehouse_Deep_Dive.py
@@ -107,10 +108,36 @@ Note: Use `--enable-templating NONE` to prevent `snow sql` from interpreting `&`
 
 ## Streamlit Deployment
 
+### Option 1: Snowflake CLI (may fail with some account formats)
+
 ```bash
 cd streamlit_app
 snow streamlit deploy --connection cost_optimization
 ```
+
+**Known issue**: `snow streamlit deploy` fails with account format `chc70950.us-east-1` — reports "connection host was missing or not in the expected format". Adding `host` to `connections.toml` does not resolve it.
+
+### Option 2: deploy_sis.py (recommended)
+
+Automated deployment script adapted from the Tensor project pattern. Reads connection config from `~/.snowflake/connections.toml`, uploads files with cache-busting timestamps, and creates the Streamlit app via SQL.
+
+```bash
+cd streamlit_app
+python deploy_sis.py
+
+# Or with explicit connection name:
+python deploy_sis.py --connection cost_optimization
+```
+
+What it does:
+1. Reads `~/.snowflake/connections.toml` for auth (supports PROGRAMMATIC_ACCESS_TOKEN, SNOWFLAKE_JWT, externalbrowser)
+2. Creates the stage `COST_OPTIMIZATION_DB.PUBLIC.STREAMLIT_STAGE` if needed
+3. Injects `# _deploy_ts=...` into .py files to bust SiS module cache on redeploy
+4. Uploads all app files via PUT to the stage
+5. Runs `CREATE OR REPLACE STREAMLIT` to create/update the app
+6. Verifies deployment and lists staged files
+
+Requires: `snowflake-snowpark-python` (`pip install snowflake-snowpark-python`)
 
 ## Architecture
 
