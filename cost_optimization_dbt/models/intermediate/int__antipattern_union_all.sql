@@ -38,4 +38,12 @@ WITH all_antipatterns AS (
 
 SELECT *
 FROM all_antipatterns
-WHERE LOWER(sample_query_text) NOT LIKE 'execute streamlit%'
+WHERE sample_query_text IS NOT NULL
+  AND TRIM(sample_query_text) != ''
+  AND LOWER(sample_query_text) NOT LIKE 'execute streamlit%'
+  AND LOWER(sample_query_text) NOT LIKE 'execute dbt project%'
+  AND LOWER(sample_query_text) NOT LIKE 'execute dbt%'
+  AND LOWER(sample_query_text) NOT LIKE 'create or replace%'
+  AND LOWER(sample_query_text) NOT LIKE 'alter%'
+  AND LOWER(sample_query_text) NOT LIKE 'grant%'
+  AND LOWER(sample_query_text) NOT LIKE 'call%'
