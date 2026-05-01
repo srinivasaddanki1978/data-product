@@ -80,6 +80,17 @@ WHERE IS_ANOMALY = TRUE
 ORDER BY DATE DESC
 """
 
+COST_HEATMAP_DOW_HOUR = f"""
+SELECT
+    DAYOFWEEKISO(start_time) AS day_of_week,
+    EXTRACT(HOUR FROM start_time) AS hour_of_day,
+    SUM(estimated_cost_usd) AS total_cost
+FROM {INT}.INT__QUERY_COST_ATTRIBUTION
+WHERE start_time >= DATEADD('day', -{{days}}, CURRENT_DATE())
+GROUP BY 1, 2
+ORDER BY 1, 2
+"""
+
 # ── Data Freshness ──────────────────────────────────────────────────
 DATA_FRESHNESS = f"""
 SELECT SOURCE_NAME, MODEL_NAME, LATEST_RECORD_AT, STALENESS_MINUTES, FRESHNESS_STATUS

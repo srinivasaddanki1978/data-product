@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from utils.connection import run_query
 from utils.formatters import format_currency
-from utils.queries import COST_TRENDS_DAILY, ANOMALY_DAYS
+from utils.queries import COST_TRENDS_DAILY, ANOMALY_DAYS, COST_HEATMAP_DOW_HOUR
 
 st.set_page_config(page_title="Trend Analysis", layout="wide")
 st.title("Trend Analysis")
@@ -57,18 +57,40 @@ try:
         else:
             st.success("No anomalies detected in the selected period.")
 
-        # ── Heatmap: cost by day of week ─────────────────────────────
-        st.subheader("Cost by Day of Week")
-        dow_names = {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu",
-                     4: "Fri", 5: "Sat", 6: "Sun"}
-        df_heatmap = df.copy()
-        df_heatmap["DAY_NAME"] = df_heatmap["DAY_OF_WEEK"].map(dow_names)
-        dow_agg = df_heatmap.groupby("DAY_NAME")[["TOTAL_COST"]].mean().reset_index()
-        fig_bar = px.bar(dow_agg, x="DAY_NAME", y="TOTAL_COST",
-                         title="Average Daily Cost by Day of Week",
-                         color="TOTAL_COST", color_continuous_scale="Blues")
-        fig_bar.update_layout(height=350)
-        st.plotly_chart(fig_bar, use_container_width=True)
+        # ── Heatmap: cost by day of week × hour of day ──────────────
+        st.subheader("Cost by Day of Week & Hour of Day")
+        try:
+            heatmap_query = COST_HEATMAP_DOW_HOUR.format(days=days_back)
+            df_heatmap = run_query(heatmap_query)
+            if not df_heatmap.empty:
+                import pandas as pd
+                dow_labels = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu",
+                              5: "Fri", 6: "Sat", 7: "Sun"}
+                df_heatmap["DAY_NAME"] = df_heatmap["DAY_OF_WEEK"].map(dow_labels)
+                pivot = df_heatmap.pivot(
+                    index="DAY_NAME", columns="HOUR_OF_DAY", values="TOTAL_COST"
+                ).reindex([dow_labels[i] for i in range(1, 8)])
+                pivot = pivot.fillna(0)
+
+                fig_hm = go.Figure(data=go.Heatmap(
+                    z=pivot.values,
+                    x=[f"{int(h)}:00" for h in pivot.columns],
+                    y=pivot.index,
+                    colorscale="Blues",
+                    hovertemplate="Day: %{y}<br>Hour: %{x}<br>Cost: $%{z:.2f}<extra></extra>",
+                ))
+                fig_hm.update_layout(
+                    title="Cost Concentration — Day of Week × Hour of Day",
+                    xaxis_title="Hour of Day",
+                    yaxis_title="Day of Week",
+                    height=400,
+                    yaxis=dict(autorange="reversed"),
+                )
+                st.plotly_chart(fig_hm, use_container_width=True)
+            else:
+                st.info("No hourly cost data available for the selected period.")
+        except Exception as hm_err:
+            st.warning(f"Could not load heatmap: {hm_err}")
 
     else:
         st.warning("No trend data available.")
