@@ -73,9 +73,21 @@ try:
         st.dataframe(
             df_filtered[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
                           "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
-                          "RECOMMENDATION", "SAMPLE_QUERY_TEXT"]],
+                          "RECOMMENDATION"]],
             use_container_width=True,
         )
+
+        # ── Query detail view with formatted SQL ───────────────────
+        st.subheader("Query Details")
+        for _, row in df_filtered.iterrows():
+            label = (f"#{int(row['OPTIMIZATION_RANK'])} — {row['ANTIPATTERN_TYPE']} | "
+                     f"{row['USER_NAME']} | {format_currency(row['ESTIMATED_WASTE_USD'])} waste")
+            with st.expander(label):
+                st.markdown(f"**Severity:** {row['SEVERITY']}")
+                st.markdown(f"**Warehouse:** {row['WAREHOUSE_NAME']}")
+                st.markdown(f"**Recommendation:** {row['RECOMMENDATION']}")
+                st.markdown("**Query:**")
+                st.code(row["SAMPLE_QUERY_TEXT"], language="sql")
     else:
         st.info("No anti-patterns detected. Queries are running efficiently.")
 
