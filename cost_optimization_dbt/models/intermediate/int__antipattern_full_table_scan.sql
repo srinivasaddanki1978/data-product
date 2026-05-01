@@ -6,7 +6,13 @@ SELECT
     'FULL_TABLE_SCAN' AS antipattern_type,
     'P2' AS severity,
     estimated_cost_usd AS estimated_waste_usd,
-    'Add clustering key or WHERE filter on partition column to reduce scan scope' AS recommendation,
+    'Scanned ' || q.partitions_scanned || ' of ' || q.partitions_total || ' partitions ('
+        || ROUND({{ safe_divide('q.partitions_scanned', 'q.partitions_total') }} * 100, 0) || '%). '
+        || 'Scanned ' || ROUND(q.bytes_scanned / 1048576.0, 1) || ' MB. '
+        || 'FIX: (1) Add a WHERE filter on the partition/date column to prune partitions. '
+        || '(2) Add a clustering key: ALTER TABLE <table> CLUSTER BY (<date_col>). '
+        || '(3) If joining, ensure join keys align with clustering keys.'
+    AS recommendation,
     LEFT(query_text, 500) AS sample_query_text,
     partitions_scanned,
     partitions_total,

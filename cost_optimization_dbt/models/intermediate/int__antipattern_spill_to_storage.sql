@@ -11,8 +11,15 @@ SELECT
     qc.estimated_cost_usd AS estimated_waste_usd,
     CASE
         WHEN q.bytes_spilled_to_remote_storage > 0
-        THEN 'Increase warehouse size for this query, or optimize to reduce memory usage'
-        ELSE 'Query spilling to local storage — consider warehouse resize for heavy workloads'
+        THEN 'Spilled ' || ROUND(q.bytes_spilled_to_remote_storage / 1073741824.0, 2) || ' GB to REMOTE storage (slow). '
+            || 'FIX: (1) Increase warehouse size by one level to add more memory. '
+            || '(2) Break query into smaller steps using temp tables. '
+            || '(3) Reduce data volume with tighter WHERE filters or pre-aggregation. '
+            || '(4) Avoid wide SELECT * — select only needed columns.'
+        ELSE 'Spilled ' || ROUND(q.bytes_spilled_to_local_storage / 1073741824.0, 2) || ' GB to LOCAL storage. '
+            || 'FIX: (1) Optimize JOINs — ensure join keys are selective. '
+            || '(2) Add WHERE filters to reduce intermediate result set size. '
+            || '(3) If persistent, increase warehouse size by one level.'
     END AS recommendation,
     LEFT(q.query_text, 500) AS sample_query_text,
     q.bytes_spilled_to_local_storage,

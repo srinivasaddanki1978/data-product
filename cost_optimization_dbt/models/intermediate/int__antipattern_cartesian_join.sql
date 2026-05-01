@@ -6,7 +6,12 @@ SELECT
     'CARTESIAN_JOIN' AS antipattern_type,
     'P1' AS severity,
     qc.estimated_cost_usd AS estimated_waste_usd,
-    'Review join conditions — likely missing or incorrect ON clause' AS recommendation,
+    'Produced ' || TO_VARCHAR(q.rows_produced, '999,999,999,999') || ' rows — likely a cartesian/cross join. '
+        || 'FIX: (1) Check all JOIN conditions — a missing or incorrect ON clause causes row explosion. '
+        || '(2) Ensure every JOIN has a proper equality condition on the correct key columns. '
+        || '(3) Use INNER JOIN instead of CROSS JOIN unless intentional. '
+        || '(4) Add a WHERE clause to filter before joining to reduce intermediate rows.'
+    AS recommendation,
     LEFT(q.query_text, 500) AS sample_query_text,
     q.rows_produced,
     q.bytes_scanned,

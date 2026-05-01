@@ -6,7 +6,11 @@ SELECT
     'SELECT_STAR' AS antipattern_type,
     'P3' AS severity,
     qc.estimated_cost_usd AS estimated_waste_usd,
-    'Specify only needed columns to reduce I/O and improve performance' AS recommendation,
+    'Scanned ' || ROUND(q.bytes_scanned / 1048576.0, 1) || ' MB using SELECT *. '
+        || 'FIX: (1) Replace SELECT * with only the columns you need. '
+        || '(2) This reduces I/O, memory usage, and network transfer. '
+        || '(3) In Snowflake columnar storage, fewer columns = proportionally less data scanned.'
+    AS recommendation,
     LEFT(q.query_text, 500) AS sample_query_text,
     q.bytes_scanned,
     q.end_time

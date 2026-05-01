@@ -6,7 +6,12 @@ SELECT
     'LARGE_SORT_NO_LIMIT' AS antipattern_type,
     'P3' AS severity,
     qc.estimated_cost_usd AS estimated_waste_usd,
-    'Add LIMIT clause or remove ORDER BY if full sorted result is not needed' AS recommendation,
+    'Sorted ' || TO_VARCHAR(q.rows_produced, '999,999,999') || ' rows without a LIMIT clause. '
+        || 'FIX: (1) Add LIMIT N if you only need top/bottom results. '
+        || '(2) Remove ORDER BY if the consuming application does its own sorting. '
+        || '(3) If sorting is needed, add WHERE filters to reduce row count before sorting. '
+        || '(4) Consider using QUALIFY with ROW_NUMBER() instead of ORDER BY + LIMIT for top-N queries.'
+    AS recommendation,
     LEFT(q.query_text, 500) AS sample_query_text,
     q.rows_produced,
     q.end_time

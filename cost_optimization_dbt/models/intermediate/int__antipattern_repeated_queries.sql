@@ -6,7 +6,12 @@ SELECT
     'REPEATED_EXPENSIVE' AS antipattern_type,
     'P2' AS severity,
     total_cost_usd AS estimated_waste_usd,
-    'Cache results in a table or leverage result caching (ensure same role/warehouse) — ran ' || execution_count || ' times' AS recommendation,
+    'Ran ' || execution_count || ' times (avg ' || ROUND(avg_execution_time_s, 1) || 's, avg cost $' || ROUND(avg_cost_per_execution, 4) || '/run). '
+        || 'FIX: (1) Materialize results into a table and read from it instead of re-running. '
+        || '(2) Use Snowflake result caching — ensure same role, warehouse, and no DDL changes between runs. '
+        || '(3) Schedule the query once via a task and store output in a results table. '
+        || '(4) If used by a dashboard, cache at the application layer with a TTL.'
+    AS recommendation,
     COALESCE(sample_query_text, query_hash) AS sample_query_text,
     execution_count,
     avg_execution_time_s,
