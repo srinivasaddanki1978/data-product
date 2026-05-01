@@ -27,6 +27,14 @@ WITH queries AS (
     FROM {{ ref('stg__query_history') }}
     WHERE execution_status = 'SUCCESS'
       AND warehouse_name IS NOT NULL
+      AND query_text IS NOT NULL
+      AND TRIM(query_text) != ''
+      AND LOWER(query_text) NOT LIKE 'execute streamlit%'
+      AND LOWER(query_text) NOT LIKE 'execute dbt%'
+      AND LOWER(query_text) NOT LIKE 'create or replace%'
+      AND LOWER(query_text) NOT LIKE 'alter%'
+      AND LOWER(query_text) NOT LIKE 'grant%'
+      AND LOWER(query_text) NOT LIKE 'call%'
 ),
 
 -- Derive credits_per_hour from the warehouse_size column in query_history.

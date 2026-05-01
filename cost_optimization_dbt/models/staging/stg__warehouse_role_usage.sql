@@ -9,6 +9,8 @@ WITH query_usage AS (
     WHERE warehouse_name IS NOT NULL
       AND role_name IS NOT NULL
       AND user_name IS NOT NULL
+      AND LOWER(query_text) NOT LIKE 'execute streamlit%'
+      AND LOWER(query_text) NOT LIKE 'execute dbt%'
 ),
 
 usage_stats AS (
@@ -21,6 +23,8 @@ usage_stats AS (
         MAX(end_time) AS last_seen
     FROM {{ ref('stg__query_history') }}
     WHERE warehouse_name IS NOT NULL
+      AND LOWER(query_text) NOT LIKE 'execute streamlit%'
+      AND LOWER(query_text) NOT LIKE 'execute dbt%'
     GROUP BY 1, 2, 3
 )
 

@@ -23,3 +23,10 @@ FROM {{ ref('stg__query_history') }} q
 CROSS JOIN config c
 WHERE q.bytes_spilled_to_remote_storage > c.threshold_value
   AND q.end_time >= DATEADD('hour', -1, CURRENT_TIMESTAMP())
+  AND q.query_text IS NOT NULL
+  AND LOWER(q.query_text) NOT LIKE 'execute streamlit%'
+  AND LOWER(q.query_text) NOT LIKE 'execute dbt%'
+  AND LOWER(q.query_text) NOT LIKE 'create or replace%'
+  AND LOWER(q.query_text) NOT LIKE 'alter%'
+  AND LOWER(q.query_text) NOT LIKE 'grant%'
+  AND LOWER(q.query_text) NOT LIKE 'call%'
