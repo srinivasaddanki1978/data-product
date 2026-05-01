@@ -77,6 +77,64 @@ try:
             use_container_width=True,
             height=500,
         )
+        # ── AI Query Analysis (Cortex) ─────────────────────────────
+        st.subheader("AI Query Analysis (Snowflake Cortex)")
+        st.caption("Select a query from the list above and get AI-powered optimization suggestions.")
+
+        query_options = {
+            f"#{int(r['OPTIMIZATION_RANK'])} — {r['ANTIPATTERN_TYPE']} | {r['USER_NAME']} | {format_currency(r['ESTIMATED_WASTE_USD'])}": idx
+            for idx, r in df_filtered.reset_index(drop=True).iterrows()
+        }
+
+        if query_options:
+            selected_label = st.selectbox("Select a query to analyze", list(query_options.keys()))
+            selected_idx = query_options[selected_label]
+            selected_row = df_filtered.reset_index(drop=True).iloc[selected_idx]
+
+            with st.expander("View selected query SQL", expanded=False):
+                st.code(selected_row["SAMPLE_QUERY_TEXT"], language="sql")
+
+            if st.button("Analyze with Cortex AI"):
+                with st.spinner("Analyzing query with Snowflake Cortex..."):
+                    query_text = selected_row["SAMPLE_QUERY_TEXT"].replace("'", "''")
+                    antipattern = selected_row["ANTIPATTERN_TYPE"]
+                    recommendation = selected_row["RECOMMENDATION"].replace("'", "''")
+
+                    cortex_prompt = f"""You are a Snowflake SQL performance expert. Analyze this query that has been flagged with the anti-pattern: {antipattern}.
+
+Current recommendation: {recommendation}
+
+SQL Query:
+{query_text}
+
+Provide a specific, actionable optimization plan:
+1. What exactly is wrong with this query (be specific to this SQL, not generic)
+2. The optimized version of this query (rewritten SQL)
+3. What Snowflake features to leverage (clustering, materialized views, result caching, etc.)
+4. Expected performance improvement
+
+Keep the response concise and practical."""
+
+                    cortex_prompt_escaped = cortex_prompt.replace("'", "''")
+
+                    cortex_sql = f"""
+                    SELECT SNOWFLAKE.CORTEX.COMPLETE(
+                        'mistral-large2',
+                        '{cortex_prompt_escaped}'
+                    ) AS ai_suggestion
+                    """
+
+                    try:
+                        df_ai = run_query(cortex_sql)
+                        if not df_ai.empty:
+                            ai_response = df_ai.iloc[0]["AI_SUGGESTION"]
+                            st.markdown("**AI Optimization Suggestion:**")
+                            st.markdown(ai_response)
+                        else:
+                            st.warning("No response from Cortex. Try again.")
+                    except Exception as cortex_err:
+                        st.error(f"Cortex analysis failed: {cortex_err}")
+
     else:
         st.info("No anti-patterns detected. Queries are running efficiently.")
 
