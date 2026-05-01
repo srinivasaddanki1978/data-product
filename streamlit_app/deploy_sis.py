@@ -163,48 +163,53 @@ def should_include(rel_path: str) -> bool:
 
 def upload_files(session, deploy_ts: str):
     """Upload all app files to stage with cache-busting timestamps."""
+    import shutil
+    import tempfile
+
     # Clear existing files
     print(f"  Clearing @{STAGE_NAME}/{STAGE_PREFIX}/ ...")
     session.sql(f"REMOVE @{STAGE_NAME}/{STAGE_PREFIX}/").collect()
 
-    uploaded = 0
-    for root, dirs, files in os.walk(PROJECT_ROOT):
-        dirs[:] = [d for d in dirs if d not in EXCLUDE and not d.startswith(".")]
-        for fname in files:
-            abs_path = Path(root) / fname
-            rel_path = abs_path.relative_to(PROJECT_ROOT).as_posix()
-            if not should_include(rel_path):
-                continue
+    # Create a temp directory for modified .py files (preserves original filenames)
+    tmp_dir = Path(tempfile.mkdtemp(prefix="cost_opt_deploy_"))
 
-            # For .py files, inject deploy timestamp to bust SiS module cache
-            if fname.endswith(".py"):
-                content = abs_path.read_text(encoding="utf-8")
-                content = f"# _deploy_ts={deploy_ts}\n" + content
+    try:
+        uploaded = 0
+        for root, dirs, files in os.walk(PROJECT_ROOT):
+            dirs[:] = [d for d in dirs if d not in EXCLUDE and not d.startswith(".")]
+            for fname in files:
+                abs_path = Path(root) / fname
+                rel_path = abs_path.relative_to(PROJECT_ROOT).as_posix()
+                if not should_include(rel_path):
+                    continue
 
-                # Write to a temp file for PUT
-                import tempfile
-                tmp = Path(tempfile.mktemp(suffix=f"_{fname}"))
-                tmp.write_text(content, encoding="utf-8")
-                upload_path = tmp
-            else:
-                upload_path = abs_path
+                # For .py files, inject deploy timestamp to bust SiS module cache
+                if fname.endswith(".py"):
+                    content = abs_path.read_text(encoding="utf-8")
+                    content = f"# _deploy_ts={deploy_ts}\n" + content
 
-            stage_dir = f"@{STAGE_NAME}/{STAGE_PREFIX}/{Path(rel_path).parent.as_posix()}"
-            stage_dir = stage_dir.rstrip("/.")
+                    # Write to temp dir preserving the original filename
+                    tmp_file = tmp_dir / rel_path
+                    tmp_file.parent.mkdir(parents=True, exist_ok=True)
+                    tmp_file.write_text(content, encoding="utf-8")
+                    upload_path = tmp_file
+                else:
+                    upload_path = abs_path
 
-            put_sql = (
-                f"PUT 'file://{upload_path.as_posix()}' '{stage_dir}/' "
-                f"AUTO_COMPRESS=FALSE OVERWRITE=TRUE"
-            )
-            session.sql(put_sql).collect()
-            uploaded += 1
-            print(f"  [upload] {rel_path}")
+                stage_dir = f"@{STAGE_NAME}/{STAGE_PREFIX}/{Path(rel_path).parent.as_posix()}"
+                stage_dir = stage_dir.rstrip("/.")
 
-            # Clean up temp file
-            if fname.endswith(".py") and upload_path != abs_path:
-                upload_path.unlink(missing_ok=True)
+                put_sql = (
+                    f"PUT 'file://{upload_path.as_posix()}' '{stage_dir}/' "
+                    f"AUTO_COMPRESS=FALSE OVERWRITE=TRUE"
+                )
+                session.sql(put_sql).collect()
+                uploaded += 1
+                print(f"  [upload] {rel_path}")
 
-    return uploaded
+        return uploaded
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 # ---------------------------------------------------------------------------
