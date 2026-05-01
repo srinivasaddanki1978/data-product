@@ -28,3 +28,6 @@ Thumbs.db
 # Large files
 *.mp4
 *.mov
+
+# Old docs (moved out of docs/)
+old_docs/
