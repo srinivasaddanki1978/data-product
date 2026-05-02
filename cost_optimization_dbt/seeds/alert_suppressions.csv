@@ -1,1 +1,2 @@
 alert_id,resource_value,suppression_reason,created_by,start_date,end_date
+storage_growth_anomaly,COST_OPTIMIZATION_DB,Initial dbt deployment - expected storage growth from creating all models,SRINIVAS,2026-04-28,2026-05-15

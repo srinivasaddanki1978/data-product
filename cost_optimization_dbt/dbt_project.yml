@@ -20,6 +20,10 @@ seeds:
     +schema: SEEDS
     alert_suppressions:
       +column_types:
+        alert_id: varchar
+        resource_value: varchar
+        suppression_reason: varchar
+        created_by: varchar
         start_date: date
         end_date: date
     bank_holidays:
