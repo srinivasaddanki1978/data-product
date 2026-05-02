@@ -1,9 +1,63 @@
 """Query Optimizer — Anti-pattern detection with optimization recommendations."""
 
+import re
 import streamlit as st
 import plotly.express as px
 from utils.connection import run_query
 from utils.formatters import format_currency, format_number
+
+
+def _extract_table_names(sql_text):
+    """Extract fully-qualified or bare table names from SQL text."""
+    pattern = r'(?:FROM|JOIN)\s+([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+){0,2})'
+    matches = re.findall(pattern, sql_text, re.IGNORECASE)
+    # Deduplicate while preserving order
+    seen = set()
+    unique = []
+    for m in matches:
+        key = m.upper()
+        if key not in seen:
+            seen.add(key)
+            unique.append(key)
+    return unique
+
+
+def _get_table_metadata(table_names):
+    """Fetch clustering key, row count, and size for each table."""
+    metadata_parts = []
+    for tbl in table_names[:5]:  # Limit to 5 tables to keep prompt size reasonable
+        parts = tbl.split(".")
+        try:
+            if len(parts) == 3:
+                db, schema, table = parts
+                sql = (f"SELECT TABLE_NAME, ROW_COUNT, BYTES, CLUSTERING_KEY "
+                       f"FROM {db}.INFORMATION_SCHEMA.TABLES "
+                       f"WHERE TABLE_SCHEMA = '{schema}' AND TABLE_NAME = '{table}'")
+            elif len(parts) == 2:
+                schema, table = parts
+                sql = (f"SELECT TABLE_NAME, ROW_COUNT, BYTES, CLUSTERING_KEY "
+                       f"FROM INFORMATION_SCHEMA.TABLES "
+                       f"WHERE TABLE_SCHEMA = '{schema}' AND TABLE_NAME = '{table}'")
+            else:
+                sql = (f"SELECT TABLE_NAME, ROW_COUNT, BYTES, CLUSTERING_KEY "
+                       f"FROM INFORMATION_SCHEMA.TABLES "
+                       f"WHERE TABLE_NAME = '{parts[0]}'")
+            df_meta = run_query(sql)
+            if not df_meta.empty:
+                row = df_meta.iloc[0]
+                row_count = row.get("ROW_COUNT")
+                bytes_val = row.get("BYTES")
+                clustering = row.get("CLUSTERING_KEY") or "None"
+                size_mb = round(bytes_val / 1048576.0, 1) if bytes_val else "Unknown"
+                row_str = f"{row_count:,.0f}" if row_count else "Unknown"
+                metadata_parts.append(
+                    f"  - {tbl}: {row_str} rows, {size_mb} MB, clustering_key={clustering}"
+                )
+            else:
+                metadata_parts.append(f"  - {tbl}: (metadata not available)")
+        except Exception:
+            metadata_parts.append(f"  - {tbl}: (could not fetch metadata)")
+    return "\n".join(metadata_parts)
 
 PUB = "COST_OPTIMIZATION_DB.PUBLICATION"
 
@@ -95,10 +149,15 @@ try:
                 st.code(selected_row["SAMPLE_QUERY_TEXT"], language="sql")
 
             if st.button("Analyze with Cortex AI"):
-                with st.spinner("Analyzing query with Snowflake Cortex..."):
+                with st.spinner("Fetching table metadata and analyzing with Cortex..."):
                     query_text = selected_row["SAMPLE_QUERY_TEXT"].replace("'", "''")
+                    raw_query_text = selected_row["SAMPLE_QUERY_TEXT"]
                     antipattern = selected_row["ANTIPATTERN_TYPE"]
                     recommendation = selected_row["RECOMMENDATION"].replace("'", "''")
+
+                    # Fetch real table metadata
+                    table_names = _extract_table_names(raw_query_text)
+                    table_metadata = _get_table_metadata(table_names) if table_names else "No tables detected."
 
                     cortex_prompt = f"""You are a Snowflake SQL performance expert. Analyze this query that has been flagged with the anti-pattern: {antipattern}.
 
@@ -107,10 +166,15 @@ Current recommendation: {recommendation}
 SQL Query:
 {query_text}
 
+TABLE METADATA (from Snowflake catalog — use this to give accurate suggestions):
+{table_metadata}
+
+IMPORTANT: Check the clustering_key for each table above. If a table ALREADY has a clustering key, do NOT suggest adding one — instead suggest how to leverage the existing clustering in WHERE/JOIN conditions. Only suggest adding clustering if clustering_key=None.
+
 Provide a specific, actionable optimization plan:
 1. What exactly is wrong with this query (be specific to this SQL, not generic)
 2. The optimized version of this query (rewritten SQL)
-3. What Snowflake features to leverage (clustering, materialized views, result caching, etc.)
+3. What Snowflake features to leverage — base your suggestions on the actual table metadata above (existing clustering keys, table sizes, row counts)
 4. Expected performance improvement
 
 Keep the response concise and practical."""
