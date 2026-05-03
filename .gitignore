@@ -29,5 +29,8 @@ Thumbs.db
 *.mp4
 *.mov
 
+# Streamlit deployment output
+streamlit_app/output/
+
 # Old docs (moved out of docs/)
 old_docs/
