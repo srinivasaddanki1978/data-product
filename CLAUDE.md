@@ -14,14 +14,25 @@ data-product/
 ├── CLAUDE.md
 ├── .gitignore
 ├── setup_snowflake_objects.py              # Snowflake DB/schema/warehouse setup
+├── schedule_dbt_runs.py                    # Python scheduler (3 daily runs)
+├── run_dbt_pipeline.bat                    # Windows Task Scheduler batch script
 ├── Connect-token-secret.txt                # Auth token (DO NOT COMMIT)
 │
-├── docs/                                    # Model & seed documentation
+├── docs/                                    # Documentation
 │   ├── models_staging.md                    # 15 staging model docs
 │   ├── models_intermediate.md               # 31 intermediate model docs
 │   ├── models_publication.md                # 16 publication model docs
 │   ├── models_alerts.md                     # 10 alert model docs
-│   └── seeds.md                             # 8 seed file docs
+│   ├── seeds.md                             # 8 seed file docs
+│   ├── user_guide.md                        # Dashboard user guide
+│   ├── runbook.md                           # Operational runbook
+│   └── workload_generator.md                # Workload generator docs
+│
+├── workload_generator/                      # Demo workload generator
+│   ├── generate_workloads.py                # 10 anti-pattern scenarios
+│   ├── demo_runner.py                       # End-to-end demo orchestrator
+│   ├── scan_environment.py                  # Snowflake environment discovery
+│   └── setup_demo_environment.py            # Demo warehouse/schema setup
 │
 ├── cost_optimization_dbt/                   # dbt project (Snowflake native dbt)
 │   ├── dbt_project.yml                      # Project config + on-run-end hook
@@ -40,12 +51,13 @@ data-product/
 │   ├── tests/                               # Custom generic + singular tests (168 total)
 │   └── snowflake_objects/                   # Snowflake infrastructure SQL
 │       ├── setup_alerts_infrastructure.sql  # Procedures, tasks, network rules
-│       └── setup_webhook_secrets.sql        # Per-channel Teams webhook secrets
+│       ├── setup_webhook_secrets.sql        # Per-channel Teams webhook secrets
+│       └── setup_email_reports.sql          # Email notification integration + procedures
 │
 └── streamlit_app/                           # Streamlit-in-Snowflake dashboard
     ├── app.py                               # Main entry: KPIs + cost donut
     ├── deploy_sis.py                        # Automated SiS deployment script
-    ├── pages/                               # 10 interactive pages
+    ├── pages/                               # 12 interactive pages
     │   ├── 1_Executive_Summary.py
     │   ├── 2_Warehouse_Deep_Dive.py
     │   ├── 3_Team_Attribution.py
@@ -55,7 +67,9 @@ data-product/
     │   ├── 7_Warehouse_Optimizer.py
     │   ├── 8_Query_Optimizer.py
     │   ├── 9_Storage_Optimizer.py
-    │   └── 10_Recommendations_Hub.py
+    │   ├── 10_Recommendations_Hub.py
+    │   ├── 11_Cost_Forecast.py
+    │   └── 12_Report_Settings.py
     ├── utils/                               # connection, queries, formatters
     ├── snowflake.yml                        # Streamlit-in-Snowflake config
     └── environment.yml                      # Python dependencies
@@ -139,6 +153,69 @@ What it does:
 
 Requires: `snowflake-snowpark-python` (`pip install snowflake-snowpark-python`)
 
+## Workload Generator
+
+Generates intentional Snowflake workloads that trigger every detection mechanism in the framework — 10 scenarios covering all 6 anti-pattern types, cost spikes, idle warehouses, and multi-team attribution.
+
+```bash
+# Run all 10 scenarios
+python workload_generator/generate_workloads.py --scenario all
+
+# List available scenarios
+python workload_generator/generate_workloads.py --list
+
+# Full demo: setup → scan → run → verify
+python workload_generator/demo_runner.py --step all
+
+# Quick demo (3 key scenarios only)
+python workload_generator/demo_runner.py --step quick-demo
+```
+
+See [docs/workload_generator.md](docs/workload_generator.md) for full scenario reference.
+
+## Cortex AI Query Optimization
+
+The **Query Optimizer** page (page 8) uses Snowflake Cortex AI to generate optimization suggestions for expensive queries. Table metadata (clustering keys, row counts, column details) is enriched from `INFORMATION_SCHEMA` to provide context-aware recommendations.
+
+## Email Reports
+
+Weekly executive cost reports delivered via Snowflake email notification integration.
+
+```bash
+# Deploy email infrastructure (procedures, tasks, notification integration)
+snow sql --connection cost_optimization --enable-templating NONE \
+  -f cost_optimization_dbt/snowflake_objects/setup_email_reports.sql
+```
+
+```sql
+-- Manual trigger
+CALL COST_OPTIMIZATION_DB.PUBLIC.SEND_WEEKLY_REPORT(ARRAY_CONSTRUCT('recipient@example.com'));
+
+-- Enable scheduled delivery (Monday 8 AM UTC)
+ALTER TASK COST_OPTIMIZATION_DB.PUBLIC.SEND_WEEKLY_REPORT_TASK RESUME;
+```
+
+## dbt Scheduling
+
+Two options for automated pipeline refreshes:
+
+### Option 1: Python scheduler (schedule_dbt_runs.py)
+
+```bash
+# Run once immediately
+python schedule_dbt_runs.py --run-now
+
+# Install as Windows Task Scheduler jobs (3 daily runs: 10:30, 13:00, 16:00)
+python schedule_dbt_runs.py --install
+
+# Include seeds in the run
+python schedule_dbt_runs.py --run-now --full
+```
+
+### Option 2: Windows batch script (run_dbt_pipeline.bat)
+
+Schedule `run_dbt_pipeline.bat` in Windows Task Scheduler at 10:30 AM, 1:00 PM, and 4:00 PM. Logs output to timestamped files in `logs/`.
+
 ## Architecture
 
 - **Source**: `SNOWFLAKE.ACCOUNT_USAGE` (14 views, 365-day retention)
@@ -147,7 +224,8 @@ Requires: `snowflake-snowpark-python` (`pip install snowflake-snowpark-python`)
 - **Publication**: 16 table models — dashboard-ready aggregations, executive reports, ROI tracking
 - **Alerts**: 10 models — 7 alert types, suppression filtering (rules + bank holidays), episode-based deduplication, Teams Adaptive Card payloads
 - **Seeds**: 8 CSV files — credit pricing, alert configuration, budgets, suppressions, bank holidays, recommendation actions
-- **Streamlit**: 10-page interactive dashboard with drill-down, filtering, CSV export
+- **Streamlit**: 12-page interactive dashboard with drill-down, filtering, CSV export
+- **Cortex AI**: Query optimization suggestions powered by Snowflake Cortex with real table metadata (clustering keys, row counts)
 - **on-run-end**: Automatic Teams alert delivery after every `dbt run`/`dbt build` via `call_send_teams_alerts` macro
 
 ## Alert Pipeline
@@ -172,6 +250,8 @@ Detection (6 models) → Suppression (union_all) → State Tracker (episode dedu
 - `safe_divide` macro prevents divide-by-zero across all cost calculations
 - `call_send_teams_alerts` macro checks `INFORMATION_SCHEMA.PROCEDURES` before calling to avoid failures when procedure is not deployed
 - Seasonality-aware anomaly detection uses day-of-week, day-of-month, and month-end baselines with z-score thresholds
+- Non-user query filtering: system queries (SYSTEM user) and Streamlit app queries are excluded from anti-pattern detection and cost attribution
+- Cortex AI integration uses real table metadata (clustering keys, row counts, column types) from INFORMATION_SCHEMA for context-aware optimization suggestions
 
 ## Key Domain Context
 

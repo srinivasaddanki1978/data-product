@@ -11,7 +11,9 @@ A production-grade cost visibility, optimization, and alerting system built on S
 - **Alerting** — 7 configurable alert types with episode-based deduplication, Microsoft Teams delivery, holiday suppression, and targeted suppression rules
 - **Forecasting** — 90-day cost projections with confidence intervals, per-team monthly forecasts
 - **Recommendations Engine** — Unified priority-scored recommendations across warehouse, query, and storage with ROI tracking
-- **Interactive Dashboard** — 10-page Streamlit-in-Snowflake app with drill-down, filtering, and CSV export
+- **AI-Powered Query Analysis** — Cortex AI optimization suggestions with table metadata context
+- **Demo Workload Generator** — 10 realistic scenarios to showcase every anti-pattern detection
+- **Interactive Dashboard** — 12-page Streamlit-in-Snowflake app with drill-down, filtering, and CSV export
 
 ## Architecture
 
@@ -27,7 +29,7 @@ SNOWFLAKE.ACCOUNT_USAGE (14 views)
   +-----+------+
   |            |
 Streamlit    Teams Alerts
-(10 pages)   (7 alert types, 2 channels)
+(12 pages)   (7 alert types, 2 channels)
 ```
 
 ## Repository Structure
@@ -43,20 +45,31 @@ data-product/
 │   ├── seeds/                      # 8 configuration CSVs
 │   ├── macros/                     # generate_schema_name, safe_divide, call_send_teams_alerts
 │   ├── tests/                      # Custom generic + singular tests
-│   └── snowflake_objects/          # Alert infrastructure SQL (procedures, tasks, secrets)
+│   └── snowflake_objects/          # Infrastructure SQL (alerts, webhooks, email reports)
 │
 ├── streamlit_app/                  # Streamlit-in-Snowflake dashboard
 │   ├── app.py                      # Main entry: KPIs + cost donut chart
-│   └── pages/                      # 10 interactive pages
+│   └── pages/                      # 12 interactive pages
 │
-├── docs/                           # Model and seed documentation
+├── workload_generator/             # Demo workload generator (10 scenarios)
+│   ├── generate_workloads.py       # Anti-pattern scenario runner
+│   ├── demo_runner.py              # End-to-end demo orchestrator
+│   ├── scan_environment.py         # Snowflake environment discovery
+│   └── setup_demo_environment.py   # Demo warehouse/schema setup
+│
+├── docs/                           # Documentation
 │   ├── models_staging.md
 │   ├── models_intermediate.md
 │   ├── models_publication.md
 │   ├── models_alerts.md
-│   └── seeds.md
+│   ├── seeds.md
+│   ├── user_guide.md
+│   ├── runbook.md
+│   └── workload_generator.md
 │
-└── setup_snowflake_objects.py      # Initial DB/schema/warehouse setup
+├── setup_snowflake_objects.py      # Initial DB/schema/warehouse setup
+├── schedule_dbt_runs.py            # Python scheduler (3 daily runs)
+└── run_dbt_pipeline.bat            # Windows Task Scheduler batch script
 ```
 
 ## Prerequisites
@@ -125,6 +138,36 @@ python deploy_sis.py
 
 Reads connection config from `~/.snowflake/connections.toml`, uploads all files with cache-busting timestamps, and creates the Streamlit app. Requires `snowflake-snowpark-python`.
 
+## Workload Generator
+
+Generate realistic Snowflake workloads that trigger every detection mechanism in the framework — useful for demos and validation.
+
+```bash
+# One-time setup: create demo warehouses and logging table
+python workload_generator/setup_demo_environment.py
+
+# Run all 10 scenarios
+python workload_generator/generate_workloads.py --scenario all
+
+# Or run the full demo pipeline (setup → scan → run → verify)
+python workload_generator/demo_runner.py --step all
+```
+
+| Scenario | Anti-Pattern Triggered | Warehouse |
+|---|---|---|
+| full_table_scan | Full table scan (no partition pruning) | COMPUTE_WH |
+| select_star | SELECT * on large joins | COMPUTE_WH |
+| spill_to_storage | Memory spill from complex window functions | COMPUTE_WH |
+| repeated_query | Same query structure 25x | COMPUTE_WH |
+| cartesian_join | Unconstrained cross join | COMPUTE_WH |
+| large_sort_no_limit | ORDER BY without LIMIT | COMPUTE_WH |
+| expensive_join | Complex multi-table join with CTEs | COMPUTE_WH |
+| cost_spike | 4 heavy queries fired rapidly | COMPUTE_WH |
+| multi_warehouse | Same query across 3 warehouses | COMPUTE_WH, ANALYTICS_WH, ETL_WH |
+| idle_warehouse | Resume warehouse with no queries | ANALYTICS_WH |
+
+See [docs/workload_generator.md](docs/workload_generator.md) for full documentation.
+
 ## dbt Model Layers
 
 | Layer | Models | Materialization | Purpose |
@@ -151,6 +194,8 @@ See `docs/` for detailed documentation of every model and seed.
 | Query Optimizer | Anti-pattern detection results with optimization guidance |
 | Storage Optimizer | Unused tables, time travel waste, transient candidates |
 | Recommendations Hub | Unified priority-ranked recommendations with ROI tracking |
+| Cost Forecast | Linear projections with confidence intervals, team-level forecasts |
+| Report Settings | Preview weekly executive report, configure email recipients |
 
 ## Alert Types
 
@@ -189,10 +234,13 @@ All configuration is managed through seed CSV files — no code changes needed:
 
 ## Documentation
 
-Detailed model documentation is in the `docs/` folder:
+Detailed documentation is in the `docs/` folder:
 
 - [Staging Models](docs/models_staging.md) — 15 source mirrors
 - [Intermediate Models](docs/models_intermediate.md) — 31 business logic models
 - [Publication Models](docs/models_publication.md) — 16 dashboard-ready models
 - [Alert Models](docs/models_alerts.md) — 10 alert pipeline models + infrastructure
 - [Seeds](docs/seeds.md) — 8 configuration files
+- [User Guide](docs/user_guide.md) — Dashboard navigation and configuration
+- [Operational Runbook](docs/runbook.md) — Pipeline operations and troubleshooting
+- [Workload Generator](docs/workload_generator.md) — Demo scenario reference

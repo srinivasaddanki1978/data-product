@@ -75,6 +75,23 @@ The Cost Optimization Dashboard runs as a **Streamlit-in-Snowflake (SiS)** app i
 - Each recommendation includes ready-to-run SQL
 - ROI tracking for implemented recommendations
 
+### 11. Cost Forecast
+- Linear projections with 95% confidence intervals based on historical cost trends
+- **KPI cards**: Next month projected, next quarter projected, projected annual spend, daily trend
+- Line chart with actual vs forecast traces (separated by data type)
+- Team-level forecasts showing per-team monthly projections
+- Stacked bar chart by cost category (compute, storage, serverless)
+- CSV export for offline analysis
+
+### 12. Report Settings
+- Preview the weekly executive report without sending
+- **Cost summary**: This Week vs Last Week with week-over-week percentage change
+- **Breakdown**: Compute, Storage, and Serverless cost splits
+- **Top drivers**: Top 3 warehouses by cost contribution
+- **Alert summary**: Active alert count from the last 7 days
+- **Recipient configuration**: Configure email recipients via Snowflake notification integration
+- **Manual trigger**: Run `CALL COST_OPTIMIZATION_DB.PUBLIC.SEND_WEEKLY_REPORT(ARRAY_CONSTRUCT('email@example.com'))` to send on demand
+
 ---
 
 ## 3. Configuring Alerts

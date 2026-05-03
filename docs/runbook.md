@@ -65,7 +65,7 @@ ORDER BY STALENESS_MINUTES DESC;
 ```sql
 -- Alerts generated but not yet delivered
 SELECT *
-FROM COST_OPTIMIZATION_DB.INTERMEDIATE.INT__TEAMS_ALERT_PAYLOAD
+FROM COST_OPTIMIZATION_DB.PUBLICATION.PUB__TEAMS_ALERT_PAYLOAD
 WHERE sent_at IS NULL
 ORDER BY created_at DESC;
 ```
@@ -283,3 +283,98 @@ GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE TO ROLE ACCOUNTADMIN;
 **Cause**: Snowflake-native dbt (`snow dbt execute`) does not support the `docs` subcommand. This is a platform limitation.
 
 **Workaround**: Model documentation is maintained in the `docs/` directory as markdown files (`models_staging.md`, `models_intermediate.md`, `models_publication.md`, `models_alerts.md`, `seeds.md`).
+
+---
+
+## 10. Running Workload Scenarios
+
+The workload generator creates intentional Snowflake workloads that trigger every detection mechanism in the framework.
+
+### One-time setup
+
+```bash
+# Create demo warehouses (ANALYTICS_WH, ETL_WH) and workload logging table
+python workload_generator/setup_demo_environment.py
+```
+
+### Generate workloads
+
+```bash
+# Run all 10 scenarios
+python workload_generator/generate_workloads.py --scenario all
+
+# Run a specific scenario
+python workload_generator/generate_workloads.py --scenario full_table_scan
+
+# List available scenarios
+python workload_generator/generate_workloads.py --list
+```
+
+### Full demo orchestration
+
+```bash
+# End-to-end: setup → scan → run → verify
+python workload_generator/demo_runner.py --step all
+
+# Quick demo (3 key scenarios only)
+python workload_generator/demo_runner.py --step quick-demo
+```
+
+### Verify workloads in ACCOUNT_USAGE
+
+After running workloads, wait 45 minutes to 3 hours for ACCOUNT_USAGE latency, then rebuild the pipeline:
+
+```bash
+snow dbt execute cost_optimization build
+```
+
+Verify tagged queries appear:
+
+```sql
+SELECT QUERY_TAG, QUERY_TYPE, TOTAL_ELAPSED_TIME, BYTES_SCANNED
+FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY
+WHERE QUERY_TAG LIKE '%scenario:%'
+ORDER BY START_TIME DESC
+LIMIT 20;
+```
+
+See [workload_generator.md](workload_generator.md) for full scenario reference.
+
+---
+
+## 11. Email Reports
+
+Weekly executive cost reports are sent via Snowflake email notification integration.
+
+### Deploy email infrastructure
+
+```bash
+snow sql --connection cost_optimization --enable-templating NONE \
+  -f cost_optimization_dbt/snowflake_objects/setup_email_reports.sql
+```
+
+This creates:
+- Email notification integration
+- `SEND_WEEKLY_REPORT()` Python procedure (queries `PUB__WEEKLY_EXECUTIVE_REPORT`, formats HTML email)
+- `SEND_WEEKLY_REPORT_TASK` scheduled task (Monday 8 AM UTC, created suspended)
+
+### Manual trigger
+
+```sql
+CALL COST_OPTIMIZATION_DB.PUBLIC.SEND_WEEKLY_REPORT(
+  ARRAY_CONSTRUCT('recipient@example.com')
+);
+```
+
+### Enable scheduled delivery
+
+```sql
+-- Update ALLOWED_RECIPIENTS in the notification integration first
+ALTER TASK COST_OPTIMIZATION_DB.PUBLIC.SEND_WEEKLY_REPORT_TASK RESUME;
+```
+
+### Disable scheduled delivery
+
+```sql
+ALTER TASK COST_OPTIMIZATION_DB.PUBLIC.SEND_WEEKLY_REPORT_TASK SUSPEND;
+```
