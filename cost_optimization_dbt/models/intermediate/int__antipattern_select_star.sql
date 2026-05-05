@@ -11,7 +11,7 @@ SELECT
         || '(2) This reduces I/O, memory usage, and network transfer. '
         || '(3) In Snowflake columnar storage, fewer columns = proportionally less data scanned.'
     AS recommendation,
-    LEFT(q.query_text, 500) AS sample_query_text,
+    LEFT(q.query_text, 2000) AS sample_query_text,
     q.bytes_scanned,
     q.end_time
 FROM {{ ref('stg__query_history') }} q

@@ -21,7 +21,7 @@ SELECT
         || '(3) Break into smaller queries or use materialized intermediate tables. '
         || '(4) Consider upgrading warehouse size if query is I/O bound.'
     AS recommendation,
-    LEFT(q.query_text, 500) AS sample_query_text,
+    LEFT(q.query_text, 2000) AS sample_query_text,
     q.end_time
 FROM {{ ref('stg__query_history') }} q
 LEFT JOIN {{ ref('int__query_cost_attribution') }} qc USING (query_id)

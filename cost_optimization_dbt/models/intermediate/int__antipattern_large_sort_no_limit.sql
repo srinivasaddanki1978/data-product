@@ -12,7 +12,7 @@ SELECT
         || '(3) If sorting is needed, add WHERE filters to reduce row count before sorting. '
         || '(4) Consider using QUALIFY with ROW_NUMBER() instead of ORDER BY + LIMIT for top-N queries.'
     AS recommendation,
-    LEFT(q.query_text, 500) AS sample_query_text,
+    LEFT(q.query_text, 2000) AS sample_query_text,
     q.rows_produced,
     q.end_time
 FROM {{ ref('stg__query_history') }} q
