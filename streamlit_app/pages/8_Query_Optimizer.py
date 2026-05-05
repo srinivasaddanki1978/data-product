@@ -124,41 +124,29 @@ try:
         if wh_filter:
             df_filtered = df_filtered[df_filtered["WAREHOUSE_NAME"].isin(wh_filter)]
 
-        df_display = df_filtered[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
-                                   "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
-                                   "RECOMMENDATION", "SAMPLE_QUERY_TEXT"]].reset_index(drop=True)
-
         st.dataframe(
-            df_display[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
-                        "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
-                        "RECOMMENDATION"]],
+            df_filtered[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
+                          "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
+                          "RECOMMENDATION", "SAMPLE_QUERY_TEXT"]],
             use_container_width=True,
-            height=400,
+            height=500,
         )
-
         # ── AI Query Analysis (Cortex) ─────────────────────────────
         st.subheader("AI Query Analysis (Snowflake Cortex)")
-        st.caption("Select a query below and click **Analyze with Cortex AI**.")
+        st.caption("Select a query from the list above and get AI-powered optimization suggestions.")
 
-        radio_labels = [
-            f"#{int(r['OPTIMIZATION_RANK'])} | {r['SEVERITY']} | "
-            f"{r['ANTIPATTERN_TYPE']} | {r['USER_NAME']} | "
-            f"{format_currency(r['ESTIMATED_WASTE_USD'])}"
-            for _, r in df_display.iterrows()
-        ]
+        query_options = {
+            f"#{int(r['OPTIMIZATION_RANK'])} — {r['ANTIPATTERN_TYPE']} | {r['USER_NAME']} | {format_currency(r['ESTIMATED_WASTE_USD'])}": idx
+            for idx, r in df_filtered.reset_index(drop=True).iterrows()
+        }
 
-        selected_idx = st.radio(
-            "Select a query",
-            range(len(radio_labels)),
-            format_func=lambda i: radio_labels[i],
-        )
+        if query_options:
+            selected_label = st.selectbox("Select a query to analyze", list(query_options.keys()))
+            selected_idx = query_options[selected_label]
+            selected_row = df_filtered.reset_index(drop=True).iloc[selected_idx]
 
-        selected_row = df_display.iloc[selected_idx]
-
-        with st.expander("View selected query SQL", expanded=True):
-            st.code(selected_row["SAMPLE_QUERY_TEXT"], language="sql")
-
-        if selected_row is not None:
+            with st.expander("View selected query SQL", expanded=False):
+                st.code(selected_row["SAMPLE_QUERY_TEXT"], language="sql")
             if st.button("Analyze with Cortex AI"):
                 with st.spinner("Fetching table metadata and analyzing with Cortex..."):
                     query_text = selected_row["SAMPLE_QUERY_TEXT"].replace("'", "''")
