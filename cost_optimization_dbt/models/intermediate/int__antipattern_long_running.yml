@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: int__antipattern_long_running
+  description: Detects queries running longer than 5 minutes as optimization candidates.
+  columns:
+  - name: query_id
+    tests:
+    - not_null
+  - name: antipattern_type
+    tests:
+    - accepted_values:
+        values: ['LONG_RUNNING']

@@ -34,6 +34,12 @@ WITH all_antipatterns AS (
     SELECT query_id, user_name, warehouse_name, antipattern_type, severity,
            estimated_waste_usd, recommendation, sample_query_text, end_time
     FROM {{ ref('int__antipattern_large_sort_no_limit') }}
+
+    UNION ALL
+
+    SELECT query_id, user_name, warehouse_name, antipattern_type, severity,
+           estimated_waste_usd, recommendation, sample_query_text, end_time
+    FROM {{ ref('int__antipattern_long_running') }}
 )
 
 SELECT *
