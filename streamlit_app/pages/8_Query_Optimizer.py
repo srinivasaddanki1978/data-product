@@ -128,34 +128,45 @@ try:
                                    "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
                                    "RECOMMENDATION", "SAMPLE_QUERY_TEXT"]].reset_index(drop=True)
 
-        st.dataframe(
-            df_display[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
+        # Add a checkbox column for row selection
+        df_display.insert(0, "SELECT", False)
+
+        st.caption("Check a row to select it for AI analysis below.")
+        edited_df = st.data_editor(
+            df_display[["SELECT", "OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
                         "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
                         "RECOMMENDATION"]],
             use_container_width=True,
             height=400,
+            disabled=["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
+                      "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
+                      "RECOMMENDATION"],
+            hide_index=True,
         )
 
         # ── AI Query Analysis (Cortex) ─────────────────────────────
         st.subheader("AI Query Analysis (Snowflake Cortex)")
-        st.caption("Select a query from the table and click **Analyze with Cortex AI**.")
 
-        query_options = [
-            f"#{int(r['OPTIMIZATION_RANK'])} — {r['ANTIPATTERN_TYPE']} | "
-            f"{r['USER_NAME']} | {format_currency(r['ESTIMATED_WASTE_USD'])}"
-            for _, r in df_display.iterrows()
-        ]
+        # Find selected row(s) — use the last checked if multiple
+        selected_mask = edited_df["SELECT"] == True
+        selected_row = None
 
-        if query_options:
-            selected_idx = st.selectbox(
-                "Select a query to analyze",
-                range(len(query_options)),
-                format_func=lambda i: query_options[i],
-            )
+        if selected_mask.any():
+            selected_idx = selected_mask[selected_mask].index[-1]
             selected_row = df_display.iloc[selected_idx]
+
+            st.info(
+                f"**Selected:** #{int(selected_row['OPTIMIZATION_RANK'])} — "
+                f"{selected_row['ANTIPATTERN_TYPE']} | {selected_row['USER_NAME']} | "
+                f"{format_currency(selected_row['ESTIMATED_WASTE_USD'])}"
+            )
 
             with st.expander("View selected query SQL", expanded=True):
                 st.code(selected_row["SAMPLE_QUERY_TEXT"], language="sql")
+        else:
+            st.caption("Check a row in the table above to analyze with Cortex AI.")
+
+        if selected_row is not None:
             if st.button("Analyze with Cortex AI"):
                 with st.spinner("Fetching table metadata and analyzing with Cortex..."):
                     query_text = selected_row["SAMPLE_QUERY_TEXT"].replace("'", "''")

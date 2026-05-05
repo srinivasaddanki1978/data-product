@@ -20,3 +20,7 @@ WHERE q.execution_status = 'SUCCESS'
   AND q.warehouse_name IS NOT NULL
   AND REGEXP_LIKE(UPPER(TRIM(q.query_text)), '^SELECT\\s+\\*\\s+FROM.*', 'i')
   AND q.bytes_scanned > 1048576  -- Only flag if scanning > 1MB
+  -- Exclude Snowflake system database queries (not user-optimizable)
+  AND COALESCE(q.database_name, '') != 'SNOWFLAKE'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ORGANIZATION_USAGE%'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ACCOUNT_USAGE%'

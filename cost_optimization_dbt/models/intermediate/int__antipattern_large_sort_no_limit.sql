@@ -21,3 +21,7 @@ WHERE q.execution_status = 'SUCCESS'
   AND q.rows_produced > 100000
   AND UPPER(q.query_text) LIKE '%ORDER BY%'
   AND UPPER(q.query_text) NOT LIKE '%LIMIT%'
+  -- Exclude Snowflake system database queries (not user-optimizable)
+  AND COALESCE(q.database_name, '') != 'SNOWFLAKE'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ORGANIZATION_USAGE%'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ACCOUNT_USAGE%'

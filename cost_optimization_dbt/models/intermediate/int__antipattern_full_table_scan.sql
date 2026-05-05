@@ -1,4 +1,6 @@
 -- Anti-pattern: Full table scans — queries scanning >80% of partitions on large tables.
+-- Excludes Snowflake system database queries (ORGANIZATION_USAGE, ACCOUNT_USAGE) as these
+-- cannot be optimized by users (no clustering keys, no user-managed partitions).
 SELECT
     query_id,
     user_name,
@@ -25,3 +27,7 @@ WHERE q.execution_status = 'SUCCESS'
   AND q.partitions_total > 100
   AND {{ safe_divide('q.partitions_scanned', 'q.partitions_total') }} > 0.8
   AND q.partitions_scanned > 0
+  -- Exclude Snowflake system database queries (not user-optimizable)
+  AND COALESCE(q.database_name, '') != 'SNOWFLAKE'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ORGANIZATION_USAGE%'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ACCOUNT_USAGE%'

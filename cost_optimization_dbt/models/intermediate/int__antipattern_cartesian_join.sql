@@ -25,3 +25,7 @@ WHERE q.execution_status = 'SUCCESS'
   -- Heuristic: rows produced much larger than bytes scanned suggests cartesian
   AND q.rows_produced > 10 * (q.bytes_scanned / 100)  -- rough row estimate
   AND q.rows_produced > 1000000  -- At least 1M rows to avoid false positives
+  -- Exclude Snowflake system database queries (not user-optimizable)
+  AND COALESCE(q.database_name, '') != 'SNOWFLAKE'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ORGANIZATION_USAGE%'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ACCOUNT_USAGE%'

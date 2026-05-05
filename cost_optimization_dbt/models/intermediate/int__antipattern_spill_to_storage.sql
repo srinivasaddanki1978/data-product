@@ -29,3 +29,7 @@ FROM {{ ref('stg__query_history') }} q
 LEFT JOIN {{ ref('int__query_cost_attribution') }} qc ON q.query_id = qc.query_id
 WHERE q.execution_status = 'SUCCESS'
   AND (q.bytes_spilled_to_local_storage > 0 OR q.bytes_spilled_to_remote_storage > 0)
+  -- Exclude Snowflake system database queries (not user-optimizable)
+  AND COALESCE(q.database_name, '') != 'SNOWFLAKE'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ORGANIZATION_USAGE%'
+  AND q.query_text NOT ILIKE '%SNOWFLAKE.ACCOUNT_USAGE%'
