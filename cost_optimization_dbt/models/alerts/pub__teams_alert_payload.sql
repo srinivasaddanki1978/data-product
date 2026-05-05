@@ -71,6 +71,23 @@ SELECT
                                 OBJECT_CONSTRUCT('title', 'Episode', 'value', ne.episode_number::VARCHAR),
                                 OBJECT_CONSTRUCT('title', 'Resolver Team', 'value', ac.resolver_team)
                             )
+                        ),
+                        -- Additional details from detection model (query_id, query preview, etc.)
+                        OBJECT_CONSTRUCT(
+                            'type', 'TextBlock',
+                            'text', '**Details**',
+                            'wrap', TRUE,
+                            'separator', TRUE
+                        ),
+                        OBJECT_CONSTRUCT(
+                            'type', 'FactSet',
+                            'facts', ARRAY_CONSTRUCT(
+                                OBJECT_CONSTRUCT('title', 'Query ID', 'value', COALESCE(PARSE_JSON(ne.details_json):query_id::VARCHAR, 'N/A')),
+                                OBJECT_CONSTRUCT('title', 'User', 'value', COALESCE(PARSE_JSON(ne.details_json):user_name::VARCHAR, 'N/A')),
+                                OBJECT_CONSTRUCT('title', 'Warehouse', 'value', COALESCE(PARSE_JSON(ne.details_json):warehouse_name::VARCHAR, 'N/A')),
+                                OBJECT_CONSTRUCT('title', 'Duration (min)', 'value', COALESCE(PARSE_JSON(ne.details_json):duration_minutes::VARCHAR, PARSE_JSON(ne.details_json):idle_minutes::VARCHAR, 'N/A')),
+                                OBJECT_CONSTRUCT('title', 'Query Preview', 'value', COALESCE(LEFT(PARSE_JSON(ne.details_json):query_preview::VARCHAR, 150), 'N/A'))
+                            )
                         )
                     )
                 )
