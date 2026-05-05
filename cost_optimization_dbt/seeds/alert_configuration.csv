@@ -6,3 +6,4 @@ credit_budget_100pct,Budget Exceeded,Monthly credits exceeded 100% of budget,P0,
 query_spill_heavy,Heavy Query Spill,Queries spilling >1GB to remote storage,P2,TRUE,cost-alerts,30,1073741824,bytes,platform-team,TRUE,,TRUE
 storage_growth_anomaly,Storage Spike,Database storage grew >20% week-over-week,P3,TRUE,cost-alerts,1440,20,percentage,data-team,TRUE,,TRUE
 repeated_expensive_query,Repeated Expensive Query,Same query hash running >20 times/day costing >$1 each,P2,TRUE,cost-alerts,60,20,count,platform-team,TRUE,,TRUE
+query_long_running,Long Running Query,Query execution exceeded 5 minutes,P2,TRUE,cost-alerts,30,5,minutes,platform-team,TRUE,,TRUE

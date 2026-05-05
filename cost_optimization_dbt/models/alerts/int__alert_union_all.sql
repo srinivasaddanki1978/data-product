@@ -28,6 +28,11 @@ WITH all_alerts AS (
 
     SELECT alert_id, detected_at, resource_key, metric_value, threshold_value, details_json
     FROM {{ ref('int__alert_repeated_expensive') }}
+
+    UNION ALL
+
+    SELECT alert_id, detected_at, resource_key, metric_value, threshold_value, details_json
+    FROM {{ ref('int__alert_query_long_running') }}
 ),
 
 suppressions AS (

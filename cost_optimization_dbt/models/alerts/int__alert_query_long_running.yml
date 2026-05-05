@@ -1,0 +1,8 @@
+version: 2
+models:
+- name: int__alert_query_long_running
+  description: Detects queries running longer than configured threshold (default 5 minutes).
+  columns:
+  - name: alert_id
+    tests:
+    - not_null
