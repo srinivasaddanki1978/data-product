@@ -128,37 +128,34 @@ try:
                                    "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
                                    "RECOMMENDATION", "SAMPLE_QUERY_TEXT"]].reset_index(drop=True)
 
-        st.caption("Click a row to select it for AI analysis below.")
-        selection = st.dataframe(
-            df_display,
+        st.dataframe(
+            df_display[["OPTIMIZATION_RANK", "ANTIPATTERN_TYPE", "SEVERITY",
+                        "USER_NAME", "WAREHOUSE_NAME", "ESTIMATED_WASTE_USD",
+                        "RECOMMENDATION"]],
             use_container_width=True,
-            height=500,
-            on_select="rerun",
-            selection_mode="single-row",
+            height=400,
         )
 
         # ── AI Query Analysis (Cortex) ─────────────────────────────
         st.subheader("AI Query Analysis (Snowflake Cortex)")
+        st.caption("Select a query from the table and click **Analyze with Cortex AI**.")
 
-        selected_rows = selection.selection.rows if selection and selection.selection else []
+        query_options = [
+            f"#{int(r['OPTIMIZATION_RANK'])} — {r['ANTIPATTERN_TYPE']} | "
+            f"{r['USER_NAME']} | {format_currency(r['ESTIMATED_WASTE_USD'])}"
+            for _, r in df_display.iterrows()
+        ]
 
-        if selected_rows:
-            selected_idx = selected_rows[0]
-            selected_row = df_display.iloc[selected_idx]
-
-            st.info(
-                f"**Selected:** #{int(selected_row['OPTIMIZATION_RANK'])} — "
-                f"{selected_row['ANTIPATTERN_TYPE']} | {selected_row['USER_NAME']} | "
-                f"{format_currency(selected_row['ESTIMATED_WASTE_USD'])}"
+        if query_options:
+            selected_idx = st.selectbox(
+                "Select a query to analyze",
+                range(len(query_options)),
+                format_func=lambda i: query_options[i],
             )
+            selected_row = df_display.iloc[selected_idx]
 
             with st.expander("View selected query SQL", expanded=True):
                 st.code(selected_row["SAMPLE_QUERY_TEXT"], language="sql")
-        else:
-            st.caption("Select a row from the table above to analyze with Cortex AI.")
-            selected_row = None
-
-        if selected_row is not None:
             if st.button("Analyze with Cortex AI"):
                 with st.spinner("Fetching table metadata and analyzing with Cortex..."):
                     query_text = selected_row["SAMPLE_QUERY_TEXT"].replace("'", "''")
