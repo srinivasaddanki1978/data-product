@@ -27,7 +27,7 @@ FROM {{ ref('stg__query_history') }} q
 CROSS JOIN config c
 WHERE q.execution_status = 'SUCCESS'
   AND q.total_elapsed_time_ms > c.threshold_value * 60000  -- threshold is in minutes
-  AND q.end_time >= DATEADD('hour', -6, CURRENT_TIMESTAMP())
+  AND q.end_time >= DATEADD('day', -7, CURRENT_TIMESTAMP())
   -- Exclude system/internal queries
   AND q.user_name != 'SYSTEM'
   AND COALESCE(q.database_name, '') != 'SNOWFLAKE'
