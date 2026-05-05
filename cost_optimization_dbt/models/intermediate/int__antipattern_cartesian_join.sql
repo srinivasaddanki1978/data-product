@@ -12,7 +12,7 @@ SELECT
         || '(3) Use INNER JOIN instead of CROSS JOIN unless intentional. '
         || '(4) Add a WHERE clause to filter before joining to reduce intermediate rows.'
     AS recommendation,
-    LEFT(q.query_text, 2000) AS sample_query_text,
+    LEFT(q.query_text, 8000) AS sample_query_text,
     q.rows_produced,
     q.bytes_scanned,
     q.end_time

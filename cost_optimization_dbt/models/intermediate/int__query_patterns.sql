@@ -20,7 +20,7 @@ WITH query_groups AS (
 sample_queries AS (
     SELECT
         query_parameterized_hash,
-        LEFT(query_text, 2000) AS sample_query_text,
+        LEFT(query_text, 8000) AS sample_query_text,
         ROW_NUMBER() OVER (PARTITION BY query_parameterized_hash ORDER BY start_time DESC) AS rn
     FROM {{ ref('int__query_cost_attribution') }}
     WHERE query_parameterized_hash IS NOT NULL
