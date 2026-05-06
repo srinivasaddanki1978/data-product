@@ -21,7 +21,7 @@ SELECT
             || '(2) Add WHERE filters to reduce intermediate result set size. '
             || '(3) If persistent, increase warehouse size by one level.'
     END AS recommendation,
-    LEFT(q.query_text, 8000) AS sample_query_text,
+    q.query_text AS sample_query_text,
     q.bytes_spilled_to_local_storage,
     q.bytes_spilled_to_remote_storage,
     q.end_time

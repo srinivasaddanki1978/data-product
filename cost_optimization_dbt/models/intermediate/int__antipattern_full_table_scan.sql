@@ -15,7 +15,7 @@ SELECT
         || '(2) Add a clustering key: ALTER TABLE <table> CLUSTER BY (<date_col>). '
         || '(3) If joining, ensure join keys align with clustering keys.'
     AS recommendation,
-    LEFT(query_text, 8000) AS sample_query_text,
+    query_text AS sample_query_text,
     partitions_scanned,
     partitions_total,
     {{ safe_divide('partitions_scanned', 'partitions_total') }} AS scan_ratio,

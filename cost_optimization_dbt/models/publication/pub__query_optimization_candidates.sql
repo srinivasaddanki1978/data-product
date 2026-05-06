@@ -8,7 +8,7 @@ SELECT
     severity,
     estimated_waste_usd,
     recommendation,
-    LEFT(sample_query_text, 8000) AS sample_query_text,
+    sample_query_text,
     end_time
 FROM {{ ref('int__antipattern_union_all') }}
 WHERE estimated_waste_usd > 0
